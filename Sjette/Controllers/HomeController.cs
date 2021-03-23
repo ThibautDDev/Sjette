@@ -94,8 +94,8 @@ namespace Sjette.Controllers
             _context.Add(user);
             await _context.SaveChangesAsync();
 
-            await validate(email, nonHashedPassword, "/");
-            return Redirect("/Account");
+            await validate(email, nonHashedPassword, "~/");
+            return Redirect("~/Account");
         }
 
         // POST: /login

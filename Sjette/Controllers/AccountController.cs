@@ -145,7 +145,7 @@ namespace Sjette.Controllers
 
             _context.Add(Activity);
             await _context.SaveChangesAsync();
-            return Redirect("/Account");
+            return Redirect("~/Account");
         }
 
 
@@ -232,7 +232,7 @@ namespace Sjette.Controllers
         public async Task<IActionResult> Logout()
         {
             await HttpContext.SignOutAsync();
-            return Redirect("/");
+            return Redirect("~/");
         }
 
     }

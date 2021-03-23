@@ -10,11 +10,10 @@
 -- 5) INSERT INTO <TableName> (<DataType>, ...)
 --    VALUES (<Data, ...)
 TRUNCATE TABLE Groups
-DROP TABLE [Users]
-DROP TABLE Activities
-DROP TABLE Groups
 DROP TABLE GroupMembership
 DROP TABLE Activities
+DROP TABLE Groups
+DROP TABLE [Users]
 
 
 --First Command
@@ -41,7 +40,7 @@ CREATE TABLE [Users] (
 	LastName	NVARCHAR(255) NOT NULL,
 	[Admin]		BIT	NOT NULL,
 	Email		NVARCHAR(255) UNIQUE NOT NULL,
-	PasswordHash NVARCHAR(255) UNIQUE NOT NULL,
+	PasswordHash NVARCHAR(255) NOT NULL,
 	[Hash]		 NVARCHAR(255) NOT NULL,
 	CreationDate DATE NOT NULL
 )
