@@ -1,0 +1,58 @@
+﻿@model Users
+@{
+    ViewData["Title"] = "Account Settings";
+    Layout = "~/Views/Shared/_LayoutAccount.cshtml";
+}
+
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-12 col-lg-10 col-xl-8 mx-auto">
+            <h1 class="h3 mb-0 text-gray-800">Your Settings, @Model.FirstName</h1>
+            <div class="my-4">
+                <form action="~/saveSettings" method="post">
+                    <hr class="my-4" />
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="firstname">Firstname</label>
+                            <input name="firstName" type="text" id="firstname" class="form-control" placeholder="@Model.FirstName" />
+                        </div>
+                        <label for="lastname">Lastname</label>
+                        <input name="lastName" type="text" id="lastname" class="form-control" placeholder="@Model.LastName" />
+                    </div>
+                    <div class="form-group">
+                        <label for="inputEmail4">Email</label>
+                        <input name="email" type="email" class="form-control" id="inputEmail4" placeholder="@Model.Email" />
+                    </div>
+                    <hr class="my-4" />
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="inputPassword4">Old Password</label>
+                                <input name="oldPassword" type="password" class="form-control" id="inputPassword5"/>
+                            </div>
+                            <div class="form-group">
+                                <label for="inputPassword5">New Password</label>
+                                <input name="newPassword" type="password" class="form-control" id="inputPassword5" />
+                            </div>
+                            <div class="form-group">
+                                <label for="inputPassword6">Confirm Password</label>
+                                <input name="newPasswordConfirm" type="password" class="form-control" id="inputPassword6" />
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <p class="mb-2">Password requirements</p>
+                            <p class="small text-muted mb-2">To create a new password, you have to meet the following requirements:</p>
+                            <ul class="small text-muted pl-4 mb-0">
+                                <li>Minimum 8 character</li>
+                                <li>At least one special character</li>
+                                <li>At least one number</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-success">Save Change</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

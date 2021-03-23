@@ -1,0 +1,13 @@
+﻿.hover:hover h4 {
+    font-weight: 900 !important;
+    text-decoration: none;
+}
+
+.hover:hover {
+    font-weight: 900 !important;
+    text-decoration: none;
+}
+
+.hoverHeader:hover {
+    background-color: #edf0f7;
+}

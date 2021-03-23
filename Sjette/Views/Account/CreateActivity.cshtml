@@ -1,0 +1,101 @@
+﻿@{
+    ViewData["Title"] = "Create Activity";
+    Layout = "~/Views/Shared/_LayoutAccount.cshtml";
+}
+
+@section scripts{
+    <script src="~/js/createActivity.js"></script>
+}
+
+@section styles{ 
+    <link rel="stylesheet" href="~/css/createActivity.css" />
+}
+
+@{
+    var userDictionairy = new Dictionary<string, string>();
+    foreach (var c in User.Claims)
+    {
+        userDictionairy.Add(c.Type.ToString(), c.Value.ToString());
+    }
+}
+
+
+<div class="d-flex justify-content-center contentHeight">
+    <div class="align-self-center">
+        <div class="p-4 rounded formBackground">
+            <form id="regForm" action="/createActivity" method="post">
+                <div class="text-center pb-4">
+                    <h1 class="display-4">Create a new activity</h1>
+                </div>
+
+                <!-- One "tab" for each step in the form: -->
+                <div class="tab">
+                    <div class="d-flex justify-content-between">
+                        <label class="form-group">
+                            <input type="radio" name="activityType" value="Cycling" required>
+                            <img src="~/img/radioBtnCycle.png" class="radioImg">
+                        </label>
+
+                        <label class="form-group">
+                            <input type="radio" name="activityType" value="Running">
+                            <img src="~/img/radioBtnRun.png" class="radioImg">
+                        </label>
+                        <label class="form-group">
+                            <input type="radio" name="activityType" value="Hiking">
+                            <img src="~/img/radioBtnWalk.png" class="radioImg">
+                        </label>
+                    </div>
+                </div>
+
+
+                <div class="tab">
+                    <div class="form-group">
+                        <label for="activityName">Activity name</label>
+                        <input required name="activityName" id="activityName" placeholder="Enter name" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label for="totalKms">Total amount of kilometers</label>
+                        <input required name="totalKms" id="totalKms" placeholder="Enter amount of kms" class="form-control" type="number" min="1">
+                    </div>
+                </div>
+
+                <div class="tab">
+                    <div class="form-group">
+                        <label for="startTime">Start time</label>
+                        <input required name="startTime" id="startTime" placeholder="Enter a time" class="form-control" type="datetime-local">
+                    </div>
+                    <div class="form-group">
+                        <label for="totalTime">Duration</label>
+                        <input required name="totalTime" id="totalTime" placeholder="Enter a time" class="form-control" type="time">
+                    </div>
+                </div>
+
+                <div class="tab">
+                    <div class="form-group">
+                        <label for="gear">Gear (optional)</label>
+                        <input name="gear" id="gear" placeholder="Enter your gear" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label for="gear">Calories (leave empty to calculate average)</label>
+                        <input name="calories" id="calories" placeholder="Enter amount of calories" class="form-control" type="number" min="1">
+                    </div>
+                </div>
+
+                <div style="overflow:auto;">
+                    <div style="float:right;">
+                        <button type="button" class="btn btn-success btn-lg" id="prevBtn" onclick="nextPrev(-1)">Previous</button>
+                        <button type="button" class="btn btn-success btn-lg" id="nextBtn" onclick="nextPrev(1)">Next</button>
+                    </div>
+                </div>
+
+                <!-- Circles which indicates the steps of the form: -->
+                <div class="text-center mt-4">
+                    <span class="step"></span>
+                    <span class="step"></span>
+                    <span class="step"></span>
+                    <span class="step"></span>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

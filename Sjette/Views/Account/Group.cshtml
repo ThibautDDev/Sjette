@@ -1,0 +1,15 @@
+﻿@{
+    ViewData["Title"] = "Groups";
+    Layout = "~/Views/Shared/_LayoutAccount.cshtml";
+}
+@{
+    var userDictionairy = new Dictionary<string, string>();
+    foreach (var c in User.Claims)
+    {
+        userDictionairy.Add(c.Type.ToString(), c.Value.ToString());
+    }
+}
+
+<div class="text-center">
+    <h1 class="h3 mb-0 text-gray-800">Groups Overview</h1>
+</div>

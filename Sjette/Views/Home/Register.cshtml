@@ -1,0 +1,59 @@
+﻿@{
+    ViewData["Title"] = "Register";
+    Layout = "~/Views/Shared/_LayoutLogin.cshtml";
+    var pError = TempData["PasswordError"] as string;
+    var eError = TempData["EmailError"] as string;
+}
+
+<div class="d-flex justify-content-center contentHeight">
+    <div class="align-self-center">
+        <div class="p-5 rounded footerLogin">
+            <form action="/register" method="post">
+                <h1 class="text-center">Register</h1>
+                <p class="hint-text text-center pb-3">Create your account. It's free and only takes a minute.</p>
+                <div class="form-group">
+                    <div class="row">
+                        <div class="col"><input type="text" class="form-control" name="firstName" placeholder="First Name" required="required"></div>
+                        <div class="col"><input type="text" class="form-control" name="lastName" placeholder="Last Name" required="required"></div>
+                    </div>
+                </div>
+                @if (!string.IsNullOrEmpty(eError))
+                {
+                    <div class="form-group">
+                        <input type="email" class="form-control is-invalid" name="email" aria-describedby="emailHelp" placeholder="Email" required="required">
+                        <small id="emailHelp" class="form-text invalid-feedback">@eError</small>
+                    </div>
+                }
+                else
+                {
+                    <div class="form-group">
+                        <input type="email" class="form-control" name="email" aria-describedby="emailHelp" placeholder="Email" required="required">
+                    </div>
+                }
+                <div class="form-group">
+                    <input type="password" class="form-control" name="nonHashedPassword" placeholder="Password" required="required">
+                </div>
+                @if (!string.IsNullOrEmpty(pError))
+                {
+                    <div class="form-group">
+                        <input type="password" aria-describedby="passwordHelp" class="form-control is-invalid" name="confirm_nonHashedPassword" placeholder="Confirm Password" required="required">
+                        <small id="passwordHelp" class="form-text invalid-feedback">@pError</small>
+                    </div>
+                }
+                else
+                { 
+                    <div class="form-group">
+                        <input type="password" aria-describedby="passwordHelp" class="form-control" name="confirm_nonHashedPassword" placeholder="Confirm Password" required="required">
+                    </div>
+                }
+
+                <div class="form-group">
+                    <label class="form-check-label"><input type="checkbox" required="required"> I accept the <a href="#">Terms of Use</a> &amp; <a href="#">Privacy Policy</a></label>
+                </div>
+                <div class="form-group">
+                    <button type="submit" value="register" class="btn btn-success btn-lg w-100">Register Now</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,64 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Sjette</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" />
+    <link rel="stylesheet" href="~/css/navbar.css" />
+    @await RenderSectionAsync("Styles", required: false)
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-lg fixed-top py-3 mb-3">
+            <div class="container">
+                <a class="navbar-brand text-uppercase font-weight-bold" asp-controller="Home" asp-action="Index">Sjette</a>
+                <button type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation" class="navbar-toggler navbar-toggler-right"><i class="fa fa-bars"></i></button>
+
+                <div id="navbarSupportedContent" class="collapse navbar-collapse">
+                    <ul class="navbar-nav ml-auto">
+                        @if (User.Identity.IsAuthenticated)
+                        {
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Account</a>
+                                <div class="dropdown-menu">
+                                    <a class="dropdown-item" asp-controller="Account" asp-action="Index">Dashboard</a>
+                                    <a class="dropdown-item" asp-controller="Account" asp-action="Activity">Activities</a>
+                                    <a class="dropdown-item" asp-controller="Account" asp-action="Group">Groups</a>
+                                    <div class="dropdown-divider"></div>
+                                    <a class="dropdown-item" asp-controller="Account" asp-action="Settings">Settings</a>
+                                    <a class="dropdown-item" asp-controller="Account" asp-action="Logout">Logout</a>
+                                </div>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Home" asp-action="Login">Login</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Home" asp-action="Register">Sign Up</a>
+                            </li>
+                        }
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+    @RenderBody()
+
+
+    <footer class="border-top footer text-dark text-center">
+        <div class="container">
+            &copy; 2021 - Sjette - Webdesign by TD
+        </div>
+    </footer>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/navbar.js"></script>
+    <script src="~/js/parallax.js"></script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

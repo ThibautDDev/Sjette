@@ -1,0 +1,734 @@
+﻿@model Tuple<Users, List<Groups>, List<Activities>, Dictionary<int, List<Activities>>>
+@{
+    ViewData["Title"] = "Dashboard";
+    Layout = "~/Views/Shared/_LayoutAccount.cshtml";
+
+    var routeUrl = Url.RouteUrl(ViewContext.RouteData.Values);
+    var qsPath = ViewContext.HttpContext.Request.QueryString.Value;
+    var url = $"{routeUrl}{qsPath}";
+
+}
+
+@{
+    int totalCalories = 0;
+    foreach (var item in Model.Item3)
+    {
+        totalCalories = totalCalories + item.TotalCalories;
+    }
+}
+
+@{
+
+    var lstCycling = new List<Activities>();
+    var lstHiking = new List<Activities>();
+    var lstRunning = new List<Activities>();
+    var lstActivitiesLastMonth = new List<Activities>();
+
+    foreach (var item in Model.Item3)
+    {
+        var x = (DateTime.Now - item.StartTime).TotalDays;
+        if (x < 30 && x > 0)
+        {
+            lstActivitiesLastMonth.Add(item);
+        }
+
+
+        if (item.ActivityType == "Cycling")
+        {
+            lstCycling.Add(item);
+        }
+        else if (item.ActivityType == "Hiking")
+        {
+            lstHiking.Add(item);
+        }
+        else
+        {
+            lstRunning.Add(item);
+        }
+    }
+
+    var tupleActivities = Tuple.Create(lstCycling, lstRunning, lstHiking);
+}
+
+@{
+    var rankingGroups = new Dictionary<int, Dictionary<int, Dictionary<string, int>>>();
+
+    foreach (var i in Model.Item4)
+    {
+        int groupId = i.Key;
+        var activityList = i.Value;
+        var userDict = new Dictionary<int, Dictionary<string, int>>();
+
+        foreach (var j in activityList)
+        {
+            var userId = j.fk_UserID;
+            var activityDict = new Dictionary<string, int>();
+            var keylist = new List<int>(userDict.Keys);
+            if (keylist.Contains(userId))
+            {
+                var usertemp = userDict[userId];
+
+                var cycling = usertemp["cycling"];
+
+                var hiking = usertemp["hiking"];
+                var running = usertemp["running"];
+                var calories = usertemp["calories"];
+                var distance = usertemp["distance"];
+
+                if (j.ActivityType == "Cycling")
+                {
+                    activityDict["cycling"] = cycling + 1;
+                    activityDict["running"] = running;
+                    activityDict["hiking"] = hiking;
+
+                }
+                else if (j.ActivityType == "Running")
+                {
+                    activityDict["running"] = running + 1;
+                    activityDict["hiking"] = hiking;
+                    activityDict["cycling"] = cycling;
+
+                }
+                else
+                {
+                    activityDict["hiking"] = hiking + 1;
+                    activityDict["running"] = running;
+                    activityDict["cycling"] = cycling;
+                }
+
+                activityDict["calories"] = calories + j.TotalCalories;
+                activityDict["distance"] = distance + Convert.ToInt32(j.TKm);
+            }
+            else
+            {
+                activityDict["running"] = 0;
+                activityDict["cycling"] = 0;
+                activityDict["hiking"] = 0;
+                if (j.ActivityType == "Cycling")
+                {
+                    activityDict["cycling"] = 1;
+
+                }
+                else if (j.ActivityType == "Running")
+                {
+                    activityDict["running"] = 1;
+                }
+                else
+                {
+                    activityDict["hiking"] = 1;
+                }
+
+                activityDict["calories"] = j.TotalCalories;
+                activityDict["distance"] = Convert.ToInt32(j.TKm);
+            }
+            userDict[userId] = activityDict;
+        }
+        rankingGroups[groupId] = userDict;
+    }
+}
+
+
+@{
+    var rankingActivities = new Dictionary<int, List<int>>();
+    var rankingHiking = new Dictionary<int, List<int>>();
+    var rankingCycling = new Dictionary<int, List<int>>();
+    var rankingRunning = new Dictionary<int, List<int>>();
+    var rankingDistance = new Dictionary<int, List<int>>();
+    var rankingCalories = new Dictionary<int, List<int>>();
+
+    foreach (var i in rankingGroups)
+    {
+        var groupId = i.Key;
+        var UserDict = i.Value;
+        var tempRankingDict1 = new Dictionary<int, int>();
+        var tempRankingDict2 = new Dictionary<int, int>();
+        var tempRankingDict3 = new Dictionary<int, int>();
+        var tempRankingDict4 = new Dictionary<int, int>();
+        var tempRankingDict5 = new Dictionary<int, int>();
+        var tempRankingDict6 = new Dictionary<int, int>();
+        foreach (var j in UserDict)
+        {
+            tempRankingDict1[j.Key] = (j.Value["hiking"] + j.Value["cycling"] + j.Value["running"]);
+            tempRankingDict2[j.Key] = j.Value["hiking"];
+            tempRankingDict3[j.Key] = j.Value["cycling"];
+            tempRankingDict4[j.Key] = j.Value["running"];
+            tempRankingDict5[j.Key] = j.Value["calories"];
+            tempRankingDict6[j.Key] = j.Value["distance"];
+        }
+        var sortedKeys1 = tempRankingDict1.OrderByDescending(x => x.Value).Select(kvp => kvp.Key).ToList();
+        var index1 = sortedKeys1.IndexOf(Model.Item1.pk_UserID);
+        rankingActivities[groupId] = new List<int>(new int[] { index1 + 1, tempRankingDict1.Count, 100 * (tempRankingDict1.Count - index1 - 1) / (tempRankingDict1.Count - 1) });
+
+        var sortedKeys2 = tempRankingDict2.OrderByDescending(x => x.Value).Select(kvp => kvp.Key).ToList();
+        var index2 = sortedKeys2.IndexOf(Model.Item1.pk_UserID);
+        rankingHiking[groupId] = new List<int>(new int[] { index2 + 1, tempRankingDict2.Count, 100 * (tempRankingDict2.Count - index2 - 1) / (tempRankingDict2.Count - 1) });
+
+        var sortedKeys3 = tempRankingDict3.OrderByDescending(x => x.Value).Select(kvp => kvp.Key).ToList();
+        var index3 = sortedKeys3.IndexOf(Model.Item1.pk_UserID);
+        rankingCycling[groupId] = new List<int>(new int[] { index3 + 1, tempRankingDict3.Count, 100 * (tempRankingDict3.Count - index3 - 1) / (tempRankingDict3.Count - 1) });
+
+        var sortedKeys4 = tempRankingDict4.OrderByDescending(x => x.Value).Select(kvp => kvp.Key).ToList();
+        var index4 = sortedKeys4.IndexOf(Model.Item1.pk_UserID);
+        rankingRunning[groupId] = new List<int>(new int[] { index4 + 1, tempRankingDict4.Count, 100 * (tempRankingDict4.Count - index4 - 1) / (tempRankingDict4.Count - 1) });
+
+        var sortedKeys5 = tempRankingDict5.OrderByDescending(x => x.Value).Select(kvp => kvp.Key).ToList();
+        var index5 = sortedKeys5.IndexOf(Model.Item1.pk_UserID);
+        rankingCalories[groupId] = new List<int>(new int[] { index5 + 1, tempRankingDict5.Count, 100 * (tempRankingDict5.Count - index5 - 1) / (tempRankingDict5.Count - 1) });
+
+        var sortedKeys6 = tempRankingDict6.OrderByDescending(x => x.Value).Select(kvp => kvp.Key).ToList();
+        var index6 = sortedKeys6.IndexOf(Model.Item1.pk_UserID);
+        rankingDistance[groupId] = new List<int>(new int[] { index6 + 1, tempRankingDict6.Count, 100 * (tempRankingDict6.Count - index6 - 1) / (tempRankingDict6.Count - 1) });
+
+    }
+}
+
+@{ 
+    var chartArray = new List<int>(new int[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0});
+    foreach (var item in Model.Item3)
+    {
+        var x = (DateTime.Now - item.StartTime).TotalDays;
+        if (x < 365 && x > 0)
+        {
+            var month = item.StartTime.Month;
+            var prev = chartArray[month-1];
+            chartArray[month - 1] = prev + 1;
+        }
+    }
+}
+
+@section Styles{
+    <link href="~/css/dashboard.css" rel="stylesheet" type="text/css" />
+}
+
+@section Scripts{
+    <script type="text/javascript">
+        var cyclingCount = @lstCycling.Count;
+        var hikingCount = @lstHiking.Count;
+        var runningCount = @lstRunning.Count;
+        var chartData = @Html.Raw(Json.Serialize(chartArray))
+    </script>
+
+    <script src="~/js/dashboard.js"></script>
+    <script src="~/lib/chart.js/Chart.min.js"></script>
+    <script src="~/js/charts/chart-area.js"></script>
+    <script src="~/js/charts/chart-pie.js"></script>
+}
+
+
+<div class="container-fluid">
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">Your Dashboard, @Model.Item1.FirstName</h1>
+    </div>
+
+    <div class="row">
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-primary shadow h-100 py-2" style="user-select:none;">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                Total activities
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">@Model.Item3.Count</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-heartbeat fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-success shadow h-100 py-2" style="user-select:none;">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                Total calories burned
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">@totalCalories</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-fire-alt fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div style="cursor:pointer; user-select:none;" class="card border-left-info shadow h-100 py-2">
+                <div onclick="changeFitnessCard(0, 1)" class="fitnessCards card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                Activities: Cycling
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">@tupleActivities.Item1.Count</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-biking fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+                <div onclick="changeFitnessCard(1, 2)" class="d-none fitnessCards card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                Activities: Running
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">@tupleActivities.Item2.Count</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-running fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+                <div onclick="changeFitnessCard(2, 0)" class="card-body d-none fitnessCards">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                Activities: Hiking
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">@tupleActivities.Item3.Count</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-hiking fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-warning shadow h-100 py-2" style="user-select:none;">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                Group memberships
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">@Model.Item2.Count</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-users fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+    <div class="row">
+        <div class="col-xl-8 col-lg-7">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Activities Overview (Monthly)</h6>
+                </div>
+                <div class="card-body">
+                    <div class="chart-area">
+                        <canvas id="myAreaChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-4 col-lg-5">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Diversity Of Activities</h6>
+                </div>
+                <div class="card-body">
+                    <div class="chart-pie pt-4 pb-2">
+                        <canvas id="myPieChart"></canvas>
+                    </div>
+                    <div class="mt-4 text-center small">
+                        <span class="mr-2">
+                            <i class="fas fa-circle text-primary"></i> Running
+                        </span>
+                        <span class="mr-2">
+                            <i class="fas fa-circle text-success"></i> Cycling
+                        </span>
+                        <span class="mr-2">
+                            <i class="fas fa-circle text-info"></i> Hiking
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+
+    <div class="row">
+        <div class="col-lg-12 mb-4">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Recent Activities (Last Month)</h6>
+                </div>
+                <div class="card-body">
+                    @if (lstActivitiesLastMonth.Count != 0)
+                    {
+
+
+                        <table class="table table-hover table-sm mb-0">
+                            <thead>
+                                <tr>
+                                    <th onclick="sortTable(0)" scope="col">Name</th>
+                                    <th onclick="sortTable(1)" scope="col">Type</th>
+                                    <th onclick="sortTable(2)" scope="col">Date</th>
+                                    <th onclick="sortTable(3)" scope="col">Duration</th>
+                                    <th onclick="sortTable(4)" scope="col">Distance</th>
+                                    <th onclick="sortTable(5)" scope="col">Calories</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in lstActivitiesLastMonth)
+                                {
+                                    <tr style="cursor:pointer;" onclick="location.href='@url/Activity?ActivityId=@item.pk_ActivityID';">
+                                        <td scope="row">@item.ActivityName</td>
+                                        <td>@item.ActivityType</td>
+                                        <td>@item.StartTime</td>
+                                        <td>@item.TTime</td>
+                                        <td>@item.TKm</td>
+                                        <td>@item.TotalCalories</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    }
+                    else
+                    {
+                        <div>No recent activities found. Add a new one <a href="/Account/CreateActivity">here!</a></div>
+                    }
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+    <div class="row">
+        <div class="col-lg-6 mb-4">
+            <div class="rankingCards card shadow mb-4">
+                <div style="cursor:pointer; user-select:none;" onclick="changeRankingCard(0,1)" class="card-header py-3 hoverHeader">
+                    <h6 class="m-0 font-weight-bold text-primary">Rank In Your Groups (Most Activities)</h6>
+                </div>
+                <div class="card-body">
+                    @foreach (var item in Model.Item2)
+                    {
+                        <div style="cursor:pointer; user-select:none;" class="hover" onclick="location.href='@url/Group?GroupId=@item.pk_GroupID'">
+                            <h4 class="small font-weight-bold">
+                                @item.GroupName <span class="float-right">@rankingActivities[item.pk_GroupID][0]<sup>th</sup> / @rankingActivities[item.pk_GroupID][1]</span>
+                            </h4>
+                            <div class="progress mb-4">
+                                @if (@rankingActivities[item.pk_GroupID][2] < 30)
+                                {
+                                    <div class="progress-bar bg-danger" role="progressbar" style="width:@rankingActivities[item.pk_GroupID][2]%"
+                                         aria-valuemin="0" aria-valuemax="100">
+                                    </div>
+
+                                }
+                                else if (@rankingActivities[item.pk_GroupID][2] < 70)
+                                {
+                                    <div class="progress-bar bg-warning" role="progressbar" style="width:@rankingActivities[item.pk_GroupID][2]%"
+                                         aria-valuemin="0" aria-valuemax="100">
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="progress-bar bg-success" role="progressbar" style="width:@rankingActivities[item.pk_GroupID][2]%"
+                                         aria-valuemin="0" aria-valuemax="100">
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    }
+
+                </div>
+            </div>
+
+            <div class="rankingCards d-none card shadow mb-4">
+                <div style="cursor:pointer; user-select:none;" onclick="changeRankingCard(1,2)" class="card-header py-3 hoverHeader">
+                    <h6 class="m-0 font-weight-bold text-primary">Rank In Your Groups (Most Cycling Activities)</h6>
+                </div>
+                <div class="card-body">
+                    @foreach (var item in Model.Item2)
+                    {
+                        <div style="cursor:pointer; user-select:none;" class="hover" onclick="location.href='@url/Group?GroupId=@item.pk_GroupID'">
+                            <h4 class="small font-weight-bold">
+                                @item.GroupName <span class="float-right">@rankingCycling[item.pk_GroupID][0]<sup>th</sup> / @rankingCycling[item.pk_GroupID][1]</span>
+                            </h4>
+                            <div class="progress mb-4">
+                                @if (rankingCycling[item.pk_GroupID][2] < 30)
+                                {
+                                    <div class="progress-bar bg-danger" role="progressbar" style="width:@rankingCycling[item.pk_GroupID][2]%"
+                                         aria-valuemin="0" aria-valuemax="100">
+                                    </div>
+
+                                }
+                                else if (rankingCycling[item.pk_GroupID][2] < 70)
+                                {
+                                    <div class="progress-bar bg-warning" role="progressbar" style="width:@rankingCycling[item.pk_GroupID][2]%"
+                                         aria-valuemin="0" aria-valuemax="100">
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="progress-bar bg-success" role="progressbar" style="width:@rankingCycling[item.pk_GroupID][2]%"
+                                         aria-valuemin="0" aria-valuemax="100">
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    }
+
+                </div>
+            </div>
+
+            <div class="rankingCards d-none card shadow mb-4">
+                <div style="cursor:pointer; user-select:none;" onclick="changeRankingCard(2,3)" class="card-header py-3 hoverHeader">
+                    <h6 class="m-0 font-weight-bold text-primary">Rank In Your Groups (Most Running Activities)</h6>
+                </div>
+                <div class="card-body">
+                    @foreach (var item in Model.Item2)
+                    {
+                        <div style="cursor:pointer; user-select:none;" class="hover" onclick="location.href='@url/Group?GroupId=@item.pk_GroupID'">
+                            <h4 class="small font-weight-bold">
+                                @item.GroupName <span class="float-right">@rankingRunning[item.pk_GroupID][0]<sup>th</sup> / @rankingRunning[item.pk_GroupID][1]</span>
+                            </h4>
+                            <div class="progress mb-4">
+                                @if (rankingRunning[item.pk_GroupID][2] < 30)
+                                {
+                                    <div class="progress-bar bg-danger" role="progressbar" style="width:@rankingRunning[item.pk_GroupID][2]%"
+                                         aria-valuemin="0" aria-valuemax="100">
+                                    </div>
+
+                                }
+                                else if (rankingRunning[item.pk_GroupID][2] < 70)
+                                {
+                                    <div class="progress-bar bg-warning" role="progressbar" style="width:@rankingRunning[item.pk_GroupID][2]%"
+                                         aria-valuemin="0" aria-valuemax="100">
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="progress-bar bg-success" role="progressbar" style="width:@rankingRunning[item.pk_GroupID][2]%"
+                                         aria-valuemin="0" aria-valuemax="100">
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    }
+
+                </div>
+            </div>
+
+            <div class="rankingCards d-none card shadow mb-4">
+                <div style="cursor:pointer; user-select:none;" onclick="changeRankingCard(3,4)" class="card-header py-3 hoverHeader">
+                    <h6 class="m-0 font-weight-bold text-primary">Rank In Your Groups (Most Hiking Activities)</h6>
+                </div>
+                <div class="card-body">
+                    @foreach (var item in Model.Item2)
+                    {
+                        <div style="cursor:pointer; user-select:none;" class="hover" onclick="location.href='@url/Group?GroupId=@item.pk_GroupID'">
+                            <h4 class="small font-weight-bold">
+                                @item.GroupName <span class="float-right">@rankingHiking[item.pk_GroupID][0]<sup>th</sup> / @rankingHiking[item.pk_GroupID][1]</span>
+                            </h4>
+                            <div class="progress mb-4">
+                                @if (rankingHiking[item.pk_GroupID][2] < 30)
+                                {
+                                    <div class="progress-bar bg-danger" role="progressbar" style="width:@rankingHiking[item.pk_GroupID][2]%"
+                                         aria-valuemin="0" aria-valuemax="100">
+                                    </div>
+
+                                }
+                                else if (rankingHiking[item.pk_GroupID][2] < 70)
+                                {
+                                    <div class="progress-bar bg-warning" role="progressbar" style="width:@rankingHiking[item.pk_GroupID][2]%"
+                                         aria-valuemin="0" aria-valuemax="100">
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="progress-bar bg-success" role="progressbar" style="width:@rankingHiking[item.pk_GroupID][2]%"
+                                         aria-valuemin="0" aria-valuemax="100">
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    }
+
+                </div>
+            </div>
+
+
+            <div class="rankingCards d-none card shadow mb-4">
+                <div style="cursor:pointer; user-select:none;" onclick="changeRankingCard(4,5)" class="card-header py-3 hoverHeader">
+                    <h6 class="m-0 font-weight-bold text-primary">Rank In Your Groups (Most Distance)</h6>
+                </div>
+                <div class="card-body">
+                    @foreach (var item in Model.Item2)
+                    {
+                        <div style="cursor:pointer; user-select:none;" class="hover" onclick="location.href='@url/Group?GroupId=@item.pk_GroupID'">
+                            <h4 class="small font-weight-bold">
+                                @item.GroupName <span class="float-right">@rankingDistance[item.pk_GroupID][0]<sup>th</sup> / @rankingDistance[item.pk_GroupID][1]</span>
+                            </h4>
+                            <div class="progress mb-4">
+                                @if (rankingDistance[item.pk_GroupID][2] < 30)
+                                {
+                                    <div class="progress-bar bg-danger" role="progressbar" style="width:@rankingDistance[item.pk_GroupID][2]%"
+                                         aria-valuemin="0" aria-valuemax="100">
+                                    </div>
+
+                                }
+                                else if (rankingDistance[item.pk_GroupID][2] < 70)
+                                {
+                                    <div class="progress-bar bg-warning" role="progressbar" style="width:@rankingDistance[item.pk_GroupID][2]%"
+                                         aria-valuemin="0" aria-valuemax="100">
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="progress-bar bg-success" role="progressbar" style="width:@rankingDistance[item.pk_GroupID][2]%"
+                                         aria-valuemin="0" aria-valuemax="100">
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    }
+
+                </div>
+            </div>
+
+            <div class="rankingCards d-none card shadow mb-4">
+                <div style="cursor:pointer; user-select:none;" onclick="changeRankingCard(5,0)" class="card-header py-3 hoverHeader">
+                    <h6 class="m-0 font-weight-bold text-primary">Rank In Your Groups (Most Calories)</h6>
+                </div>
+                <div class="card-body">
+                    @foreach (var item in Model.Item2)
+                    {
+                        <div style="cursor:pointer; user-select:none;" class="hover" onclick="location.href='@url/Group?GroupId=@item.pk_GroupID'">
+                            <h4 class="small font-weight-bold">
+                                @item.GroupName <span class="float-right">@rankingCalories[item.pk_GroupID][0]<sup>th</sup> / @rankingCalories[item.pk_GroupID][1]</span>
+                            </h4>
+                            <div class="progress mb-4">
+                                @if (rankingCalories[item.pk_GroupID][2] < 30)
+                                {
+                                    <div class="progress-bar bg-danger" role="progressbar" style="width:@rankingCalories[item.pk_GroupID][2]%"
+                                         aria-valuemin="0" aria-valuemax="100">
+                                    </div>
+
+                                }
+                                else if (rankingCalories[item.pk_GroupID][2] < 70)
+                                {
+                                    <div class="progress-bar bg-warning" role="progressbar" style="width:@rankingCalories[item.pk_GroupID][2]%"
+                                         aria-valuemin="0" aria-valuemax="100">
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="progress-bar bg-success" role="progressbar" style="width:@rankingCalories[item.pk_GroupID][2]%"
+                                         aria-valuemin="0" aria-valuemax="100">
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    }
+
+                </div>
+            </div>
+
+
+            <div class="row">
+                <div class="col-lg-12 mb-4">
+                    <div class="card shadow mb-4">
+                        <div class="card-header py-3">
+                            <h6 class="m-0 font-weight-bold text-primary">Group - Quick Menu</h6>
+                        </div>
+
+                        <div class="card-body">
+                            <ul class="m-0 pl-3">
+                                <li>
+                                    <a class="hover" asp-controller="Account" asp-action="Group">
+                                        <p class="h6 hover text-secondary font-weight-bold">Group Overview</p>
+                                    </a>
+                                </li>
+                                <hr />
+                                <li>
+                                    <a class="hover" asp-controller="Account" asp-action="CreateGroup">
+                                        <p class="h6 hover text-secondary font-weight-bold">Create A Group</p>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="hover" asp-controller="Account" asp-action="LeaveGroup">
+                                        <p class="h6 hover text-secondary font-weight-bold">Leave A Group</p>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="hover" asp-controller="Account" asp-action="DeleteGroup">
+                                        <p class="h6 hover text-secondary font-weight-bold">Delete A Group</p>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Group Memberships</h6>
+                </div>
+                <div class="card-body">
+                    @foreach (var item in Model.Item2)
+                    {
+                        <p class="h6 font-weight-bold hover" style="cursor:pointer;" onclick="location.href='@url/Group?GroupId=@item.pk_GroupID'">
+                            @item.GroupName
+                        </p>
+                    }
+                </div>
+            </div>
+
+            <!-- Approach -->
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Activity Quick Menu</h6>
+                </div>
+                <div class="card-body">
+                    <ul class="m-0 pl-3">
+                        <li>
+                            <a class="hover" asp-controller="Account" asp-action="Activity">
+                                <p class="h6 hover text-secondary font-weight-bold">Activity Overview</p>
+                            </a>
+                        </li>
+                        <hr />
+                        <li>
+                            <a class="hover" asp-controller="Account" asp-action="CreateActivity">
+                                <p class="h6 hover text-secondary font-weight-bold">Create An Activity</p>
+                            </a>
+                        </li>
+                        <li>
+                            <a class="hover" asp-controller="Account" asp-action="EditActivity">
+                                <p class="h6 hover text-secondary font-weight-bold">Edit An Activity</p>
+                            </a>
+                        </li>
+                        <li>
+                            <a class="hover" asp-controller="Account" asp-action="DeleteActivity">
+                                <p class="h6 hover text-secondary font-weight-bold">Delete An Activity</p>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
