@@ -183,15 +183,32 @@
 }
 
 @{ 
-    var chartArray = new List<int>(new int[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0});
+    var chartArray1 = new List<int>(new int[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }); // general
+    var chartArray2 = new List<int>(new int[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }); // cycling
+    var chartArray3 = new List<int>(new int[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }); // running
+    var chartArray4 = new List<int>(new int[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }); // hiking
     foreach (var item in Model.Item3)
     {
         var x = (DateTime.Now - item.StartTime).TotalDays;
         if (x < 365 && x > 0)
         {
-            var month = item.StartTime.Month;
-            var prev = chartArray[month-1];
-            chartArray[month - 1] = prev + 1;
+            var month = item.StartTime.Month - 1;
+            var prev1 = chartArray1[month];
+            chartArray1[month] = prev1 + 1;
+
+            if (item.ActivityType == "Cycling")
+            {
+                var prev2 = chartArray2[month];
+                chartArray2[month] = prev2 + 1;
+            } else if (item.ActivityType == "Running")
+            {
+                var prev3 = chartArray3[month];
+                chartArray3[month] = prev3 + 1;
+            } else
+            {
+                var prev4 = chartArray4[month];
+                chartArray4[month] = prev4 + 1;
+            }
         }
     }
 }
@@ -205,7 +222,11 @@
         var cyclingCount = @lstCycling.Count;
         var hikingCount = @lstHiking.Count;
         var runningCount = @lstRunning.Count;
-        var chartData = @Html.Raw(Json.Serialize(chartArray))
+        var data1 = @Html.Raw(Json.Serialize(chartArray1))
+        var data2 = @Html.Raw(Json.Serialize(chartArray2))
+        var data3 = @Html.Raw(Json.Serialize(chartArray3))
+        var data4 = @Html.Raw(Json.Serialize(chartArray4))
+        var chartData = data1
     </script>
 
     <script src="~/js/dashboard.js"></script>
@@ -325,8 +346,17 @@
     <div class="row">
         <div class="col-xl-8 col-lg-7">
             <div class="card shadow mb-4">
-                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                <div onclick="changeData(1, 2)" style="cursor:pointer; user-select:none;" class="lineChartHeaders card-header py-3 d-flex flex-row align-items-center justify-content-between hoverHeader">
                     <h6 class="m-0 font-weight-bold text-primary">Activities Overview (Monthly)</h6>
+                </div>
+                <div onclick="changeData(2, 3)" style="cursor:pointer; user-select:none;" class="lineChartHeaders card-header py-3 flex-row align-items-center justify-content-between d-none hoverHeader">
+                    <h6 class="m-0 font-weight-bold text-primary">Cycling Activities Overview (Monthly)</h6>
+                </div>
+                <div onclick="changeData(3, 4)" style="cursor:pointer; user-select:none;" class="lineChartHeaders card-header py-3 flex-row align-items-center justify-content-between d-none hoverHeader">
+                    <h6 class="m-0 font-weight-bold text-primary">Running Activities Overview (Monthly)</h6>
+                </div>
+                <div onclick="changeData(4, 1)" style="cursor:pointer; user-select:none;" class="lineChartHeaders card-header py-3 flex-row align-items-center justify-content-between d-none hoverHeader">
+                    <h6 class="m-0 font-weight-bold text-primary">Hiking Activities Overview (Monthly)</h6>
                 </div>
                 <div class="card-body">
                     <div class="chart-area">
@@ -373,8 +403,6 @@
                 <div class="card-body">
                     @if (lstActivitiesLastMonth.Count != 0)
                     {
-
-
                         <table class="table table-hover table-sm mb-0">
                             <thead>
                                 <tr>

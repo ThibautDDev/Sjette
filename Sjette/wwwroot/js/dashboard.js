@@ -15,3 +15,19 @@ function changeRankingCard(i, n) {
     htmlNext.classList.remove("d-none")
     htmlCur.classList.add("d-none")
 }
+
+function changeData(i, n) {
+    var x = document.getElementsByClassName("lineChartHeaders");
+    var htmlCur = x[i-1]
+    var htmlNext = x[n-1]
+    htmlNext.classList.remove("d-none")
+    htmlNext.classList.add("d-flex")
+
+    htmlCur.classList.remove("d-flex")
+    htmlCur.classList.add("d-none")
+    console.log(i, n)
+    console.log(window[`data${n}`])
+
+    myLineChart.data.datasets[0].data = window[`data${n}`]
+    myLineChart.update()
+}
