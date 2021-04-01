@@ -14,7 +14,6 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Sjette.Models.Data;
-using System.Text;
 
 namespace Sjette.Controllers
 {
@@ -159,12 +158,6 @@ namespace Sjette.Controllers
         {
             return View();
 
-        }
-
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
-        {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
     }
 }
