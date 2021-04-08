@@ -76,6 +76,8 @@ CREATE TABLE [Groups] (
 )
 
 CREATE TABLE GroupMembership (
+	--Int		GroupID		ID that references to the group of the user
+	--Int		UserID		ID that references to the user who created the group
     UserID INT NOT NULL,
     GroupID INT NOT NULL,
     PRIMARY KEY (UserID, GroupID),

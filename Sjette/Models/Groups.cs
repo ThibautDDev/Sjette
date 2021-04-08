@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Sjette.Models
 {
+    // Groups model
     public class Groups
     {
         [Key]

@@ -13,9 +13,7 @@ namespace Sjette.Models.Data
     {
 
         // Initialize the Sjette constructor.
-        public SjetteContext(DbContextOptions<SjetteContext> options) : base(options)
-        {
-        }
+        public SjetteContext(DbContextOptions<SjetteContext> options) : base(options) { }
 
         // Initialize the Sjette-User constructor.
         public DbSet<Sjette.Models.Users> Users { get; set; }

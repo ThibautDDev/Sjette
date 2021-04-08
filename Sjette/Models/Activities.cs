@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Sjette.Models
 {
+    // Activities model
     public class Activities
     {
         [Key]

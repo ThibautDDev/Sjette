@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 
 namespace Sjette.Controllers
 {
-    [Authorize]
+    [Authorize] // Make sure that only authorized users can use methods of this controller. If not, the user gets redirected to the login with a returnurl to the requested page.
     public class AccountController : Controller
     {
         private readonly ILogger<AccountController> _logger;
@@ -29,6 +29,11 @@ namespace Sjette.Controllers
         }
 
 
+        /* 
+         * Dictionairy that is used inside this controller to pass userinformation between functions.
+         * This is an alternative for the User.Claims. Because of the internal use inside this controller,
+         * the functions is set to a private one. 
+        */
         private void setUserDictionairy()
         {
             foreach (var c in User.Claims)
@@ -37,6 +42,11 @@ namespace Sjette.Controllers
             }
         }
 
+
+        /*
+         * Function to hash a password with a given hash and non-hashed version of the password.
+         * This function is private because of the internal use inside this controller.
+        */
         private string hashPassword(string hash, string password)
         {
             byte[] salt = Convert.FromBase64String(hash);
@@ -51,13 +61,21 @@ namespace Sjette.Controllers
             return returnPassword;
         } 
 
-
+        
+        /*
+         * Function that returns an userObject of the SQL DB with a given context and id.
+         * This functions is private because of the internal use inside this controller.
+        */
         private static async Task<Users> getUserByIdAsync(SjetteContext ctx, int id)
         {
             return await ctx.Users.FindAsync(id);
         }
 
 
+        /* 
+         * Function that returns a List of groupObjects of the SQL DB with a given context and userObject.
+         * This functions is private because of the internal use inside this controller.
+        */
         private static async Task<List<Groups>> getGroupsOfUserAsync(SjetteContext ctx, Users user)
         {
             return await ctx.Groups.FromSqlRaw($"SELECT G.* " +
@@ -68,6 +86,10 @@ namespace Sjette.Controllers
         }
 
 
+        /* 
+         * Function that returns a List of activityObjects of the SQL DB with a given context and userObject 
+         * This functions is private because of the internal use inside this controller.
+        */
         private static async Task<List<Activities>> getActivitiesOfUserAsync(SjetteContext ctx, Users user)
         {
             return await ctx.Activities.FromSqlRaw($"SELECT A.* " +
@@ -78,6 +100,11 @@ namespace Sjette.Controllers
         }
 
 
+        /* 
+         * Function that returns a Dictionary with as key the primaryKey of a group and as value all the activities
+         * of all users of a group with a given context and list of groupObjects. 
+         * This functions is private because of the internal use inside this controller.
+        */
         private static async Task<Dictionary<int, List<Activities>>> getActivitiesOfGroup(SjetteContext ctx, List<Groups> groupsOfUser)
         {
             Dictionary<int, List <Activities>> ReturnDict = new Dictionary<int, List<Activities>>();
@@ -106,9 +133,11 @@ namespace Sjette.Controllers
             var user = await getUserByIdAsync(_context, id);
             var groups = await getGroupsOfUserAsync(_context, user);
             var activities = await getActivitiesOfUserAsync(_context, user);
-            var groupActivites = await getActivitiesOfGroup(_context, groups);
+            var groupActivities = await getActivitiesOfGroup(_context, groups);
 
-            return View(Tuple.Create(user, groups, activities, groupActivites));
+            DashboardData data = new DashboardData(user, groups, activities, groupActivities);
+
+            return View(data);
         }
 
 
@@ -122,7 +151,6 @@ namespace Sjette.Controllers
         // GET: Account/createActivity
         public IActionResult createActivity()
         {
-
             return View();
         }
 

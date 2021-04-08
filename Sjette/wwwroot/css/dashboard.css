@@ -1,4 +1,5 @@
-﻿.hover:hover h4 {
+﻿/*HOVER attribute change*/
+.hover:hover h4 {
     font-weight: 900 !important;
     text-decoration: none;
 }

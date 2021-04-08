@@ -1,4 +1,4 @@
-﻿@model Tuple<Users, List<Groups>, List<Activities>, Dictionary<int, List<Activities>>>
+﻿@model DashboardData;
 @{
     ViewData["Title"] = "Dashboard";
     Layout = "~/Views/Shared/_LayoutAccount.cshtml";
@@ -9,224 +9,21 @@
 
 }
 
-@{
-    int totalCalories = 0;
-    foreach (var item in Model.Item3)
-    {
-        totalCalories = totalCalories + item.TotalCalories;
-    }
-}
-
-@{
-
-    var lstCycling = new List<Activities>();
-    var lstHiking = new List<Activities>();
-    var lstRunning = new List<Activities>();
-    var lstActivitiesLastMonth = new List<Activities>();
-
-    foreach (var item in Model.Item3)
-    {
-        var x = (DateTime.Now - item.StartTime).TotalDays;
-        if (x < 30 && x > 0)
-        {
-            lstActivitiesLastMonth.Add(item);
-        }
-
-
-        if (item.ActivityType == "Cycling")
-        {
-            lstCycling.Add(item);
-        }
-        else if (item.ActivityType == "Hiking")
-        {
-            lstHiking.Add(item);
-        }
-        else
-        {
-            lstRunning.Add(item);
-        }
-    }
-
-    var tupleActivities = Tuple.Create(lstCycling, lstRunning, lstHiking);
-}
-
-@{
-    var rankingGroups = new Dictionary<int, Dictionary<int, Dictionary<string, int>>>();
-
-    foreach (var i in Model.Item4)
-    {
-        int groupId = i.Key;
-        var activityList = i.Value;
-        var userDict = new Dictionary<int, Dictionary<string, int>>();
-
-        foreach (var j in activityList)
-        {
-            var userId = j.fk_UserID;
-            var activityDict = new Dictionary<string, int>();
-            var keylist = new List<int>(userDict.Keys);
-            if (keylist.Contains(userId))
-            {
-                var usertemp = userDict[userId];
-
-                var cycling = usertemp["cycling"];
-
-                var hiking = usertemp["hiking"];
-                var running = usertemp["running"];
-                var calories = usertemp["calories"];
-                var distance = usertemp["distance"];
-
-                if (j.ActivityType == "Cycling")
-                {
-                    activityDict["cycling"] = cycling + 1;
-                    activityDict["running"] = running;
-                    activityDict["hiking"] = hiking;
-
-                }
-                else if (j.ActivityType == "Running")
-                {
-                    activityDict["running"] = running + 1;
-                    activityDict["hiking"] = hiking;
-                    activityDict["cycling"] = cycling;
-
-                }
-                else
-                {
-                    activityDict["hiking"] = hiking + 1;
-                    activityDict["running"] = running;
-                    activityDict["cycling"] = cycling;
-                }
-
-                activityDict["calories"] = calories + j.TotalCalories;
-                activityDict["distance"] = distance + Convert.ToInt32(j.TKm);
-            }
-            else
-            {
-                activityDict["running"] = 0;
-                activityDict["cycling"] = 0;
-                activityDict["hiking"] = 0;
-                if (j.ActivityType == "Cycling")
-                {
-                    activityDict["cycling"] = 1;
-
-                }
-                else if (j.ActivityType == "Running")
-                {
-                    activityDict["running"] = 1;
-                }
-                else
-                {
-                    activityDict["hiking"] = 1;
-                }
-
-                activityDict["calories"] = j.TotalCalories;
-                activityDict["distance"] = Convert.ToInt32(j.TKm);
-            }
-            userDict[userId] = activityDict;
-        }
-        rankingGroups[groupId] = userDict;
-    }
-}
-
-
-@{
-    var rankingActivities = new Dictionary<int, List<int>>();
-    var rankingHiking = new Dictionary<int, List<int>>();
-    var rankingCycling = new Dictionary<int, List<int>>();
-    var rankingRunning = new Dictionary<int, List<int>>();
-    var rankingDistance = new Dictionary<int, List<int>>();
-    var rankingCalories = new Dictionary<int, List<int>>();
-
-    foreach (var i in rankingGroups)
-    {
-        var groupId = i.Key;
-        var UserDict = i.Value;
-        var tempRankingDict1 = new Dictionary<int, int>();
-        var tempRankingDict2 = new Dictionary<int, int>();
-        var tempRankingDict3 = new Dictionary<int, int>();
-        var tempRankingDict4 = new Dictionary<int, int>();
-        var tempRankingDict5 = new Dictionary<int, int>();
-        var tempRankingDict6 = new Dictionary<int, int>();
-        foreach (var j in UserDict)
-        {
-            tempRankingDict1[j.Key] = (j.Value["hiking"] + j.Value["cycling"] + j.Value["running"]);
-            tempRankingDict2[j.Key] = j.Value["hiking"];
-            tempRankingDict3[j.Key] = j.Value["cycling"];
-            tempRankingDict4[j.Key] = j.Value["running"];
-            tempRankingDict5[j.Key] = j.Value["calories"];
-            tempRankingDict6[j.Key] = j.Value["distance"];
-        }
-        var sortedKeys1 = tempRankingDict1.OrderByDescending(x => x.Value).Select(kvp => kvp.Key).ToList();
-        var index1 = sortedKeys1.IndexOf(Model.Item1.pk_UserID);
-        rankingActivities[groupId] = new List<int>(new int[] { index1 + 1, tempRankingDict1.Count, 100 * (tempRankingDict1.Count - index1 - 1) / (tempRankingDict1.Count - 1) });
-
-        var sortedKeys2 = tempRankingDict2.OrderByDescending(x => x.Value).Select(kvp => kvp.Key).ToList();
-        var index2 = sortedKeys2.IndexOf(Model.Item1.pk_UserID);
-        rankingHiking[groupId] = new List<int>(new int[] { index2 + 1, tempRankingDict2.Count, 100 * (tempRankingDict2.Count - index2 - 1) / (tempRankingDict2.Count - 1) });
-
-        var sortedKeys3 = tempRankingDict3.OrderByDescending(x => x.Value).Select(kvp => kvp.Key).ToList();
-        var index3 = sortedKeys3.IndexOf(Model.Item1.pk_UserID);
-        rankingCycling[groupId] = new List<int>(new int[] { index3 + 1, tempRankingDict3.Count, 100 * (tempRankingDict3.Count - index3 - 1) / (tempRankingDict3.Count - 1) });
-
-        var sortedKeys4 = tempRankingDict4.OrderByDescending(x => x.Value).Select(kvp => kvp.Key).ToList();
-        var index4 = sortedKeys4.IndexOf(Model.Item1.pk_UserID);
-        rankingRunning[groupId] = new List<int>(new int[] { index4 + 1, tempRankingDict4.Count, 100 * (tempRankingDict4.Count - index4 - 1) / (tempRankingDict4.Count - 1) });
-
-        var sortedKeys5 = tempRankingDict5.OrderByDescending(x => x.Value).Select(kvp => kvp.Key).ToList();
-        var index5 = sortedKeys5.IndexOf(Model.Item1.pk_UserID);
-        rankingCalories[groupId] = new List<int>(new int[] { index5 + 1, tempRankingDict5.Count, 100 * (tempRankingDict5.Count - index5 - 1) / (tempRankingDict5.Count - 1) });
-
-        var sortedKeys6 = tempRankingDict6.OrderByDescending(x => x.Value).Select(kvp => kvp.Key).ToList();
-        var index6 = sortedKeys6.IndexOf(Model.Item1.pk_UserID);
-        rankingDistance[groupId] = new List<int>(new int[] { index6 + 1, tempRankingDict6.Count, 100 * (tempRankingDict6.Count - index6 - 1) / (tempRankingDict6.Count - 1) });
-
-    }
-}
-
-@{ 
-    var chartArray1 = new List<int>(new int[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }); // general
-    var chartArray2 = new List<int>(new int[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }); // cycling
-    var chartArray3 = new List<int>(new int[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }); // running
-    var chartArray4 = new List<int>(new int[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }); // hiking
-    foreach (var item in Model.Item3)
-    {
-        var x = (DateTime.Now - item.StartTime).TotalDays;
-        if (x < 365 && x > 0)
-        {
-            var month = item.StartTime.Month - 1;
-            var prev1 = chartArray1[month];
-            chartArray1[month] = prev1 + 1;
-
-            if (item.ActivityType == "Cycling")
-            {
-                var prev2 = chartArray2[month];
-                chartArray2[month] = prev2 + 1;
-            } else if (item.ActivityType == "Running")
-            {
-                var prev3 = chartArray3[month];
-                chartArray3[month] = prev3 + 1;
-            } else
-            {
-                var prev4 = chartArray4[month];
-                chartArray4[month] = prev4 + 1;
-            }
-        }
-    }
-}
-
 @section Styles{
     <link href="~/css/dashboard.css" rel="stylesheet" type="text/css" />
 }
 
 @section Scripts{
     <script type="text/javascript">
-        var cyclingCount = @lstCycling.Count;
-        var hikingCount = @lstHiking.Count;
-        var runningCount = @lstRunning.Count;
-        var data1 = @Html.Raw(Json.Serialize(chartArray1))
-        var data2 = @Html.Raw(Json.Serialize(chartArray2))
-        var data3 = @Html.Raw(Json.Serialize(chartArray3))
-        var data4 = @Html.Raw(Json.Serialize(chartArray4))
-        var chartData = data1
+        var cyclingCount = @Model.ActivitiesCycling.Count;
+        var hikingCount = @Model.ActivitiesHiking.Count;
+        var runningCount = @Model.ActivitiesRunning.Count;
+
+        var dataActivities = @Html.Raw(Json.Serialize(Model.LineChartData["Activities"]))
+        var dataHiking = @Html.Raw(Json.Serialize(Model.LineChartData["Hiking"]))
+        var dataCycling = @Html.Raw(Json.Serialize(Model.LineChartData["Cycling"]))
+        var dataRunning = @Html.Raw(Json.Serialize(Model.LineChartData["Running"]))
+        var chartData = dataActivities
     </script>
 
     <script src="~/js/dashboard.js"></script>
@@ -238,7 +35,7 @@
 
 <div class="container-fluid">
     <div class="d-sm-flex align-items-center justify-content-between mb-4">
-        <h1 class="h3 mb-0 text-gray-800">Your Dashboard, @Model.Item1.FirstName</h1>
+        <h1 class="h3 mb-0 text-gray-800">Your Dashboard, @Model.User.FirstName</h1>
     </div>
 
     <div class="row">
@@ -250,7 +47,7 @@
                             <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
                                 Total activities
                             </div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">@Model.Item3.Count</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">@Model.UserActivities.Count</div>
                         </div>
                         <div class="col-auto">
                             <i class="fas fa-heartbeat fa-2x text-gray-300"></i>
@@ -268,7 +65,7 @@
                             <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
                                 Total calories burned
                             </div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">@totalCalories</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">@Model.TotalCalories</div>
                         </div>
                         <div class="col-auto">
                             <i class="fas fa-fire-alt fa-2x text-gray-300"></i>
@@ -286,7 +83,7 @@
                             <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
                                 Activities: Cycling
                             </div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">@tupleActivities.Item1.Count</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">@Model.ActivitiesCycling.Count</div>
                         </div>
                         <div class="col-auto">
                             <i class="fas fa-biking fa-2x text-gray-300"></i>
@@ -299,7 +96,7 @@
                             <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
                                 Activities: Running
                             </div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">@tupleActivities.Item2.Count</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">@Model.ActivitiesRunning.Count</div>
                         </div>
                         <div class="col-auto">
                             <i class="fas fa-running fa-2x text-gray-300"></i>
@@ -312,7 +109,7 @@
                             <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
                                 Activities: Hiking
                             </div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">@tupleActivities.Item3.Count</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">@Model.ActivitiesHiking.Count</div>
                         </div>
                         <div class="col-auto">
                             <i class="fas fa-hiking fa-2x text-gray-300"></i>
@@ -330,7 +127,7 @@
                             <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
                                 Group memberships
                             </div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">@Model.Item2.Count</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">@Model.UserGroups.Count</div>
                         </div>
                         <div class="col-auto">
                             <i class="fas fa-users fa-2x text-gray-300"></i>
@@ -346,16 +143,16 @@
     <div class="row">
         <div class="col-xl-8 col-lg-7">
             <div class="card shadow mb-4">
-                <div onclick="changeData(1, 2)" style="cursor:pointer; user-select:none;" class="lineChartHeaders card-header py-3 d-flex flex-row align-items-center justify-content-between hoverHeader">
+                <div onclick="changeData('Activities', 'Cycling')" style="cursor:pointer; user-select:none;" class="lineChartHeaders card-header py-3 d-flex flex-row align-items-center justify-content-between hoverHeader">
                     <h6 class="m-0 font-weight-bold text-primary">Activities Overview (Monthly)</h6>
                 </div>
-                <div onclick="changeData(2, 3)" style="cursor:pointer; user-select:none;" class="lineChartHeaders card-header py-3 flex-row align-items-center justify-content-between d-none hoverHeader">
+                <div onclick="changeData('Cycling', 'Running')" style="cursor:pointer; user-select:none;" class="lineChartHeaders card-header py-3 flex-row align-items-center justify-content-between d-none hoverHeader">
                     <h6 class="m-0 font-weight-bold text-primary">Cycling Activities Overview (Monthly)</h6>
                 </div>
-                <div onclick="changeData(3, 4)" style="cursor:pointer; user-select:none;" class="lineChartHeaders card-header py-3 flex-row align-items-center justify-content-between d-none hoverHeader">
+                <div onclick="changeData('Running', 'Hiking')" style="cursor:pointer; user-select:none;" class="lineChartHeaders card-header py-3 flex-row align-items-center justify-content-between d-none hoverHeader">
                     <h6 class="m-0 font-weight-bold text-primary">Running Activities Overview (Monthly)</h6>
                 </div>
-                <div onclick="changeData(4, 1)" style="cursor:pointer; user-select:none;" class="lineChartHeaders card-header py-3 flex-row align-items-center justify-content-between d-none hoverHeader">
+                <div onclick="changeData('Hiking', 'Activities')" style="cursor:pointer; user-select:none;" class="lineChartHeaders card-header py-3 flex-row align-items-center justify-content-between d-none hoverHeader">
                     <h6 class="m-0 font-weight-bold text-primary">Hiking Activities Overview (Monthly)</h6>
                 </div>
                 <div class="card-body">
@@ -401,7 +198,7 @@
                     <h6 class="m-0 font-weight-bold text-primary">Recent Activities (Last Month)</h6>
                 </div>
                 <div class="card-body">
-                    @if (lstActivitiesLastMonth.Count != 0)
+                    @if (Model.ActivitiesLastMonth.Count != 0)
                     {
                         <table class="table table-hover table-sm mb-0">
                             <thead>
@@ -415,7 +212,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach (var item in lstActivitiesLastMonth)
+                                @foreach (var item in Model.ActivitiesLastMonth)
                                 {
                                     <tr style="cursor:pointer;" onclick="location.href='@url/Activity?ActivityId=@item.pk_ActivityID';">
                                         <td scope="row">@item.ActivityName</td>
@@ -449,29 +246,29 @@
                     <h6 class="m-0 font-weight-bold text-primary">Rank In Your Groups (Most Activities)</h6>
                 </div>
                 <div class="card-body">
-                    @foreach (var item in Model.Item2)
+                    @foreach (var item in Model.UserGroups)
                     {
                         <div style="cursor:pointer; user-select:none;" class="hover" onclick="location.href='@url/Group?GroupId=@item.pk_GroupID'">
                             <h4 class="small font-weight-bold">
-                                @item.GroupName <span class="float-right">@rankingActivities[item.pk_GroupID][0]<sup>th</sup> / @rankingActivities[item.pk_GroupID][1]</span>
+                                @item.GroupName <span class="float-right">@Model.GroupRankingByProperty["Activities"][item.pk_GroupID][0]<sup>th</sup> / @Model.GroupRankingByProperty["Activities"][item.pk_GroupID][1]</span>
                             </h4>
                             <div class="progress mb-4">
-                                @if (@rankingActivities[item.pk_GroupID][2] < 30)
+                                @if (@Model.GroupRankingByProperty["Activities"][item.pk_GroupID][2] < 30)
                                 {
-                                    <div class="progress-bar bg-danger" role="progressbar" style="width:@rankingActivities[item.pk_GroupID][2]%"
+                                    <div class="progress-bar bg-danger" role="progressbar" style="width:@Model.GroupRankingByProperty["Activities"][item.pk_GroupID][2]%"
                                          aria-valuemin="0" aria-valuemax="100">
                                     </div>
 
                                 }
-                                else if (@rankingActivities[item.pk_GroupID][2] < 70)
+                                else if (@Model.GroupRankingByProperty["Activities"][item.pk_GroupID][2] < 70)
                                 {
-                                    <div class="progress-bar bg-warning" role="progressbar" style="width:@rankingActivities[item.pk_GroupID][2]%"
+                                    <div class="progress-bar bg-warning" role="progressbar" style="width:@Model.GroupRankingByProperty["Activities"][item.pk_GroupID][2]%"
                                          aria-valuemin="0" aria-valuemax="100">
                                     </div>
                                 }
                                 else
                                 {
-                                    <div class="progress-bar bg-success" role="progressbar" style="width:@rankingActivities[item.pk_GroupID][2]%"
+                                    <div class="progress-bar bg-success" role="progressbar" style="width:@Model.GroupRankingByProperty["Activities"][item.pk_GroupID][2]%"
                                          aria-valuemin="0" aria-valuemax="100">
                                     </div>
                                 }
@@ -487,29 +284,29 @@
                     <h6 class="m-0 font-weight-bold text-primary">Rank In Your Groups (Most Cycling Activities)</h6>
                 </div>
                 <div class="card-body">
-                    @foreach (var item in Model.Item2)
+                    @foreach (var item in Model.UserGroups)
                     {
                         <div style="cursor:pointer; user-select:none;" class="hover" onclick="location.href='@url/Group?GroupId=@item.pk_GroupID'">
                             <h4 class="small font-weight-bold">
-                                @item.GroupName <span class="float-right">@rankingCycling[item.pk_GroupID][0]<sup>th</sup> / @rankingCycling[item.pk_GroupID][1]</span>
+                                @item.GroupName <span class="float-right">@Model.GroupRankingByProperty["Cycling"][item.pk_GroupID][0]<sup>th</sup> / @Model.GroupRankingByProperty["Cycling"][item.pk_GroupID][1]</span>
                             </h4>
                             <div class="progress mb-4">
-                                @if (rankingCycling[item.pk_GroupID][2] < 30)
+                                @if (Model.GroupRankingByProperty["Cycling"][item.pk_GroupID][2] < 30)
                                 {
-                                    <div class="progress-bar bg-danger" role="progressbar" style="width:@rankingCycling[item.pk_GroupID][2]%"
+                                    <div class="progress-bar bg-danger" role="progressbar" style="width:@Model.GroupRankingByProperty["Cycling"][item.pk_GroupID][2]%"
                                          aria-valuemin="0" aria-valuemax="100">
                                     </div>
 
                                 }
-                                else if (rankingCycling[item.pk_GroupID][2] < 70)
+                                else if (Model.GroupRankingByProperty["Cycling"][item.pk_GroupID][2] < 70)
                                 {
-                                    <div class="progress-bar bg-warning" role="progressbar" style="width:@rankingCycling[item.pk_GroupID][2]%"
+                                    <div class="progress-bar bg-warning" role="progressbar" style="width:@Model.GroupRankingByProperty["Cycling"][item.pk_GroupID][2]%"
                                          aria-valuemin="0" aria-valuemax="100">
                                     </div>
                                 }
                                 else
                                 {
-                                    <div class="progress-bar bg-success" role="progressbar" style="width:@rankingCycling[item.pk_GroupID][2]%"
+                                    <div class="progress-bar bg-success" role="progressbar" style="width:@Model.GroupRankingByProperty["Cycling"][item.pk_GroupID][2]%"
                                          aria-valuemin="0" aria-valuemax="100">
                                     </div>
                                 }
@@ -525,29 +322,29 @@
                     <h6 class="m-0 font-weight-bold text-primary">Rank In Your Groups (Most Running Activities)</h6>
                 </div>
                 <div class="card-body">
-                    @foreach (var item in Model.Item2)
+                    @foreach (var item in Model.UserGroups)
                     {
                         <div style="cursor:pointer; user-select:none;" class="hover" onclick="location.href='@url/Group?GroupId=@item.pk_GroupID'">
                             <h4 class="small font-weight-bold">
-                                @item.GroupName <span class="float-right">@rankingRunning[item.pk_GroupID][0]<sup>th</sup> / @rankingRunning[item.pk_GroupID][1]</span>
+                                @item.GroupName <span class="float-right">@Model.GroupRankingByProperty["Running"][item.pk_GroupID][0]<sup>th</sup> / @Model.GroupRankingByProperty["Running"][item.pk_GroupID][1]</span>
                             </h4>
                             <div class="progress mb-4">
-                                @if (rankingRunning[item.pk_GroupID][2] < 30)
+                                @if (Model.GroupRankingByProperty["Running"][item.pk_GroupID][2] < 30)
                                 {
-                                    <div class="progress-bar bg-danger" role="progressbar" style="width:@rankingRunning[item.pk_GroupID][2]%"
+                                    <div class="progress-bar bg-danger" role="progressbar" style="width:@Model.GroupRankingByProperty["Running"][item.pk_GroupID][2]%"
                                          aria-valuemin="0" aria-valuemax="100">
                                     </div>
 
                                 }
-                                else if (rankingRunning[item.pk_GroupID][2] < 70)
+                                else if (Model.GroupRankingByProperty["Running"][item.pk_GroupID][2] < 70)
                                 {
-                                    <div class="progress-bar bg-warning" role="progressbar" style="width:@rankingRunning[item.pk_GroupID][2]%"
+                                    <div class="progress-bar bg-warning" role="progressbar" style="width:@Model.GroupRankingByProperty["Running"][item.pk_GroupID][2]%"
                                          aria-valuemin="0" aria-valuemax="100">
                                     </div>
                                 }
                                 else
                                 {
-                                    <div class="progress-bar bg-success" role="progressbar" style="width:@rankingRunning[item.pk_GroupID][2]%"
+                                    <div class="progress-bar bg-success" role="progressbar" style="width:@Model.GroupRankingByProperty["Running"][item.pk_GroupID][2]%"
                                          aria-valuemin="0" aria-valuemax="100">
                                     </div>
                                 }
@@ -563,29 +360,29 @@
                     <h6 class="m-0 font-weight-bold text-primary">Rank In Your Groups (Most Hiking Activities)</h6>
                 </div>
                 <div class="card-body">
-                    @foreach (var item in Model.Item2)
+                    @foreach (var item in Model.UserGroups)
                     {
                         <div style="cursor:pointer; user-select:none;" class="hover" onclick="location.href='@url/Group?GroupId=@item.pk_GroupID'">
                             <h4 class="small font-weight-bold">
-                                @item.GroupName <span class="float-right">@rankingHiking[item.pk_GroupID][0]<sup>th</sup> / @rankingHiking[item.pk_GroupID][1]</span>
+                                @item.GroupName <span class="float-right">@Model.GroupRankingByProperty["Hiking"][item.pk_GroupID][0]<sup>th</sup> / @Model.GroupRankingByProperty["Hiking"][item.pk_GroupID][1]</span>
                             </h4>
                             <div class="progress mb-4">
-                                @if (rankingHiking[item.pk_GroupID][2] < 30)
+                                @if (Model.GroupRankingByProperty["Hiking"][item.pk_GroupID][2] < 30)
                                 {
-                                    <div class="progress-bar bg-danger" role="progressbar" style="width:@rankingHiking[item.pk_GroupID][2]%"
+                                    <div class="progress-bar bg-danger" role="progressbar" style="width:@Model.GroupRankingByProperty["Hiking"][item.pk_GroupID][2]%"
                                          aria-valuemin="0" aria-valuemax="100">
                                     </div>
 
                                 }
-                                else if (rankingHiking[item.pk_GroupID][2] < 70)
+                                else if (Model.GroupRankingByProperty["Hiking"][item.pk_GroupID][2] < 70)
                                 {
-                                    <div class="progress-bar bg-warning" role="progressbar" style="width:@rankingHiking[item.pk_GroupID][2]%"
+                                    <div class="progress-bar bg-warning" role="progressbar" style="width:@Model.GroupRankingByProperty["Hiking"][item.pk_GroupID][2]%"
                                          aria-valuemin="0" aria-valuemax="100">
                                     </div>
                                 }
                                 else
                                 {
-                                    <div class="progress-bar bg-success" role="progressbar" style="width:@rankingHiking[item.pk_GroupID][2]%"
+                                    <div class="progress-bar bg-success" role="progressbar" style="width:@Model.GroupRankingByProperty["Hiking"][item.pk_GroupID][2]%"
                                          aria-valuemin="0" aria-valuemax="100">
                                     </div>
                                 }
@@ -602,29 +399,29 @@
                     <h6 class="m-0 font-weight-bold text-primary">Rank In Your Groups (Most Distance)</h6>
                 </div>
                 <div class="card-body">
-                    @foreach (var item in Model.Item2)
+                    @foreach (var item in Model.UserGroups)
                     {
                         <div style="cursor:pointer; user-select:none;" class="hover" onclick="location.href='@url/Group?GroupId=@item.pk_GroupID'">
                             <h4 class="small font-weight-bold">
-                                @item.GroupName <span class="float-right">@rankingDistance[item.pk_GroupID][0]<sup>th</sup> / @rankingDistance[item.pk_GroupID][1]</span>
+                                @item.GroupName <span class="float-right">@Model.GroupRankingByProperty["Distance"][item.pk_GroupID][0]<sup>th</sup> / @Model.GroupRankingByProperty["Distance"][item.pk_GroupID][1]</span>
                             </h4>
                             <div class="progress mb-4">
-                                @if (rankingDistance[item.pk_GroupID][2] < 30)
+                                @if (Model.GroupRankingByProperty["Distance"][item.pk_GroupID][2] < 30)
                                 {
-                                    <div class="progress-bar bg-danger" role="progressbar" style="width:@rankingDistance[item.pk_GroupID][2]%"
+                                    <div class="progress-bar bg-danger" role="progressbar" style="width:@Model.GroupRankingByProperty["Distance"][item.pk_GroupID][2]%"
                                          aria-valuemin="0" aria-valuemax="100">
                                     </div>
 
                                 }
-                                else if (rankingDistance[item.pk_GroupID][2] < 70)
+                                else if (Model.GroupRankingByProperty["Distance"][item.pk_GroupID][2] < 70)
                                 {
-                                    <div class="progress-bar bg-warning" role="progressbar" style="width:@rankingDistance[item.pk_GroupID][2]%"
+                                    <div class="progress-bar bg-warning" role="progressbar" style="width:@Model.GroupRankingByProperty["Distance"][item.pk_GroupID][2]%"
                                          aria-valuemin="0" aria-valuemax="100">
                                     </div>
                                 }
                                 else
                                 {
-                                    <div class="progress-bar bg-success" role="progressbar" style="width:@rankingDistance[item.pk_GroupID][2]%"
+                                    <div class="progress-bar bg-success" role="progressbar" style="width:@Model.GroupRankingByProperty["Distance"][item.pk_GroupID][2]%"
                                          aria-valuemin="0" aria-valuemax="100">
                                     </div>
                                 }
@@ -640,29 +437,29 @@
                     <h6 class="m-0 font-weight-bold text-primary">Rank In Your Groups (Most Calories)</h6>
                 </div>
                 <div class="card-body">
-                    @foreach (var item in Model.Item2)
+                    @foreach (var item in Model.UserGroups)
                     {
                         <div style="cursor:pointer; user-select:none;" class="hover" onclick="location.href='@url/Group?GroupId=@item.pk_GroupID'">
                             <h4 class="small font-weight-bold">
-                                @item.GroupName <span class="float-right">@rankingCalories[item.pk_GroupID][0]<sup>th</sup> / @rankingCalories[item.pk_GroupID][1]</span>
+                                @item.GroupName <span class="float-right">@Model.GroupRankingByProperty["Calories"][item.pk_GroupID][0]<sup>th</sup> / @Model.GroupRankingByProperty["Calories"][item.pk_GroupID][1]</span>
                             </h4>
                             <div class="progress mb-4">
-                                @if (rankingCalories[item.pk_GroupID][2] < 30)
+                                @if (Model.GroupRankingByProperty["Calories"][item.pk_GroupID][2] < 30)
                                 {
-                                    <div class="progress-bar bg-danger" role="progressbar" style="width:@rankingCalories[item.pk_GroupID][2]%"
+                                    <div class="progress-bar bg-danger" role="progressbar" style="width:@Model.GroupRankingByProperty["Calories"][item.pk_GroupID][2]%"
                                          aria-valuemin="0" aria-valuemax="100">
                                     </div>
 
                                 }
-                                else if (rankingCalories[item.pk_GroupID][2] < 70)
+                                else if (Model.GroupRankingByProperty["Calories"][item.pk_GroupID][2] < 70)
                                 {
-                                    <div class="progress-bar bg-warning" role="progressbar" style="width:@rankingCalories[item.pk_GroupID][2]%"
+                                    <div class="progress-bar bg-warning" role="progressbar" style="width:@Model.GroupRankingByProperty["Calories"][item.pk_GroupID][2]%"
                                          aria-valuemin="0" aria-valuemax="100">
                                     </div>
                                 }
                                 else
                                 {
-                                    <div class="progress-bar bg-success" role="progressbar" style="width:@rankingCalories[item.pk_GroupID][2]%"
+                                    <div class="progress-bar bg-success" role="progressbar" style="width:@Model.GroupRankingByProperty["Calories"][item.pk_GroupID][2]%"
                                          aria-valuemin="0" aria-valuemax="100">
                                     </div>
                                 }
@@ -717,7 +514,7 @@
                     <h6 class="m-0 font-weight-bold text-primary">Group Memberships</h6>
                 </div>
                 <div class="card-body">
-                    @foreach (var item in Model.Item2)
+                    @foreach (var item in Model.UserGroups)
                     {
                         <p class="h6 font-weight-bold hover" style="cursor:pointer;" onclick="location.href='@url/Group?GroupId=@item.pk_GroupID'">
                             @item.GroupName
