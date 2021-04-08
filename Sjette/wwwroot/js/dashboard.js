@@ -20,11 +20,11 @@ function changeRankingCard(i, n) {
     htmlCur.classList.add("d-none")
 }
 
-function changeData(i, n) {
+function changeData(i, n, name) {
     // This function will display a certain chart with information on press.
     var x = document.getElementsByClassName("lineChartHeaders");    //Get all headers with lineChartHeaders as className
     var htmlCur = x[i-1]
-    var htmlNext = x[n - 1]
+    var htmlNext = x[n-1]
 
     // Change displaysettings between current and next card
     htmlNext.classList.remove("d-none")
@@ -33,9 +33,9 @@ function changeData(i, n) {
     htmlCur.classList.remove("d-flex")
     htmlCur.classList.add("d-none")
     //console.log(i, n)
-    //console.log(window[`data${n}`])
+    //console.log(window[`data${name}`])
 
     // Update chart data with smooth transition and dynamic data based on the n
-    myLineChart.data.datasets[0].data = window[`data${n}`]
+    myLineChart.data.datasets[0].data = window[`data${name}`]
     myLineChart.update()
 }
