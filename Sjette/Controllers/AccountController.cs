@@ -93,8 +93,8 @@ namespace Sjette.Controllers
         private static async Task<List<Activities>> getActivitiesOfUserAsync(SjetteContext ctx, Users user)
         {
             return await ctx.Activities.FromSqlRaw($"SELECT A.* " +
-                                                   $"FROM Activities as A " +
-                                                   $"WHERE A.fk_UserID={user.pk_UserID} " +
+                                                   $"FROM Activities AS A " +
+                                                   $"WHERE a.fk_UserID={user.pk_UserID} " +
                                                    $"AND A.StartTime <= GETDATE() " + 
                                                    $"ORDER BY StartTime DESC").ToListAsync();
         }
@@ -105,7 +105,7 @@ namespace Sjette.Controllers
          * of all users of a group with a given context and list of groupObjects. 
          * This functions is private because of the internal use inside this controller.
         */
-        private static async Task<Dictionary<int, List<Activities>>> getActivitiesOfGroup(SjetteContext ctx, List<Groups> groupsOfUser)
+        private static async Task<Dictionary<int, List<Activities>>> getActivitiesOfGroupAsync(SjetteContext ctx, List<Groups> groupsOfUser)
         {
             Dictionary<int, List <Activities>> ReturnDict = new Dictionary<int, List<Activities>>();
             foreach (Groups group in groupsOfUser)
@@ -124,6 +124,42 @@ namespace Sjette.Controllers
         }
 
 
+        /* 
+         * Function that returns a Dictionary with as key the primaryKey of a group and as value all the user
+         * of a group a given context and list of groupObjects. 
+         * This functions is private because of the internal use inside this controller.
+        */
+        private static async Task<Dictionary<int, List<Users>>> getAllUsersOfGroupAsync(SjetteContext ctx, List<Groups> groupsOfUser)
+        {
+            Dictionary<int, List<Users>> ReturnDict = new Dictionary<int, List<Users>>();
+            foreach (Groups group in groupsOfUser)
+            {
+                var x = await ctx.Users.FromSqlRaw($"SELECT U.* " +
+                                                        $"FROM Users AS U " +
+                                                        $"WHERE U.pk_UserID IN " +
+                                                            $"(SELECT G.UserID " +
+                                                            $" FROM GroupMembership AS G " +
+                                                            $" WHERE G.GroupID = {group.pk_GroupID})").ToListAsync();
+                ReturnDict[group.pk_GroupID] = x;
+            }
+            return ReturnDict;
+        }
+
+
+        /* 
+         * Function that returns a list of mutual users with a given context and list of groupObjects. 
+         * This functions is private because of the internal use inside this controller.
+        */
+        private static async Task<List<Users>> getMutualUsers(SjetteContext ctx)
+        {
+            var x = await ctx.Users.FromSqlRaw($"SELECT U.* " + 
+                                               $"FROM Users as U " +
+                                               $"INNER JOIN GroupMembership AS GM " +
+                                               $"ON U.pk_UserID = GM.UserID").ToListAsync();
+            return x;
+        }
+
+
         // GET: Account/
         public async Task<IActionResult> Index()
         {
@@ -133,7 +169,7 @@ namespace Sjette.Controllers
             var user = await getUserByIdAsync(_context, id);
             var groups = await getGroupsOfUserAsync(_context, user);
             var activities = await getActivitiesOfUserAsync(_context, user);
-            var groupActivities = await getActivitiesOfGroup(_context, groups);
+            var groupActivities = await getActivitiesOfGroupAsync(_context, groups);
 
             DashboardData data = new DashboardData(user, groups, activities, groupActivities);
 
@@ -192,9 +228,21 @@ namespace Sjette.Controllers
 
 
         // GET: Account/Group
-        public IActionResult Group()
+        public async Task<IActionResult> Group()
         {
-            return View();
+            setUserDictionairy();
+
+            var id = Convert.ToInt32(UserDictionairy["UserID"]);
+            var user = await getUserByIdAsync(_context, id);
+            var groups = await getGroupsOfUserAsync(_context, user);
+            var activities = await getActivitiesOfUserAsync(_context, user);
+            var groupActivities = await getActivitiesOfGroupAsync(_context, groups);
+            var allUsersOfGroup = await getAllUsersOfGroupAsync(_context, groups);
+            var mutualUsers = await getMutualUsers(_context);
+
+            GroupData data = new GroupData(user, groups, activities, groupActivities, allUsersOfGroup, mutualUsers);
+
+            return View(data);
         }
 
 

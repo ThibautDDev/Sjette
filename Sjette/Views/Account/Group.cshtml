@@ -1,15 +1,188 @@
-﻿@{
+﻿@model GroupData;
+@{
     ViewData["Title"] = "Groups";
     Layout = "~/Views/Shared/_LayoutAccount.cshtml";
-}
-@{
-    var userDictionairy = new Dictionary<string, string>();
-    foreach (var c in User.Claims)
-    {
-        userDictionairy.Add(c.Type.ToString(), c.Value.ToString());
-    }
+
+    var routeUrl = Url.RouteUrl(ViewContext.RouteData.Values);
+    var qsPath = ViewContext.HttpContext.Request.QueryString.Value;
+    var url = $"{routeUrl}{qsPath}";
+
 }
 
-<div class="text-center">
-    <h1 class="h3 mb-0 text-gray-800">Groups Overview</h1>
+@section Styles{
+    <link href="~/css/group.css" rel="stylesheet" type="text/css" />
+}
+
+@section Scripts{
+    <script src="~/js/group.js"></script>
+}
+
+
+<div class="container-fluid">
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">Your Groups, @Model.User.FirstName</h1>
+    </div>
+
+    <div class="row">
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-primary shadow h-100 py-2" style="user-select:none;">
+                <div class="card-body vertical-center justify-content-between">
+                    <div class="row w-100 no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                Group Memberships
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">@Model.UserGroups.Count</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-users fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-success shadow h-100 py-2" style="user-select:none;">
+                <div class="card-body vertical-center justify-content-between">
+                    <div class="row w-100 no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                Groups Created
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">@Model.GroupsCreated.Count</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-folder-plus fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        @if (Model.AllUsersOfGroup != null)
+        {
+            int i = -1;
+            <div class="col-xl-3 col-md-6 mb-4">
+                <div style="cursor:pointer; user-select:none;" class="card border-left-info shadow h-100 py-2">
+                    @foreach (var userListItem in Model.AllUsersOfGroup)
+                    {
+                        int j = ++i + 1;
+                        int groupId = userListItem.Key;
+                        var userList = userListItem.Value;
+                        if (userList == Model.AllUsersOfGroup.Values.Last())
+                        {
+                            j = 0;
+                        }
+                        @if (i == 0)
+                        {
+                            <div onclick="changeGroupCard(@i, @j)" class="groupCards card-body vertical-center justify-content-between">
+                                <div class="row w-100 no-gutters align-items-center">
+                                    <div class="col mr-2">
+                                        <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                            Members - @Model.UserGroups.FirstOrDefault(obj => obj.pk_GroupID == groupId).GroupName
+                                        </div>
+                                        <div class="h5 mb-0 font-weight-bold text-gray-800">@userList.Count</div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <i class="fas fa-bullhorn fa-2x text-gray-300"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                        else
+                        {
+                            <div onclick="changeGroupCard(@i, @j)" class="d-none groupCards card-body vertical-center justify-content-between">
+                                <div class="row w-100 no-gutters align-items-center">
+                                    <div class="col mr-2">
+                                        <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                            Members - @Model.UserGroups.FirstOrDefault(obj => obj.pk_GroupID == groupId).GroupName
+                                        </div>
+                                        <div class="h5 mb-0 font-weight-bold text-gray-800">@userList.Count</div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <i class="fas fa-bullhorn fa-2x text-gray-300"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    }
+                </div>
+            </div>
+        }
+
+
+        @if (Model.MostMutualGroups.Count > 1)
+        {
+            int i = -1;
+            <div class="col-xl-3 col-md-6 mb-4">
+                <div style="cursor:pointer; user-select:none;" class="card border-left-warning shadow h-100 py-2">
+
+                    @foreach (var user in Model.MostMutualGroups)
+                    {
+                        int j = ++i + 1;
+                        if (user == Model.MostMutualGroups.Last())
+                        {
+                            j = 0;
+                        }
+                        @if (i == 0)
+                        {
+                            <div onclick="changeMutualFriendsCard(@i, @j)" class="mutualFriendsCard card-body vertical-center justify-content-between">
+                                <div class="row w-100 no-gutters align-items-center">
+                                    <div class="col mr-2">
+                                        <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                            Friends With Most Mutual Groups
+                                        </div>
+                                        <div class="h5 mb-0 font-weight-bold text-gray-800">@user.FirstName @user.LastName.Substring(0, 1).</div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <i class="fas fa-address-book fa-2x text-gray-300"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                        else
+                        {
+                            <div onclick="changeMutualFriendsCard(@i, @j)" class="d-none mutualFriendsCard card-body vertical-center justify-content-between">
+                                <div class="row w-100 no-gutters align-items-center">
+                                    <div class="col mr-2">
+                                        <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                            Friends With Most Mutual Groups
+                                        </div>
+                                        <div class="h5 mb-0 font-weight-bold text-gray-800">@user.FirstName @user.LastName.Substring(0, 1).</div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <i class="fas fa-address-book fa-2x text-gray-300"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    }
+
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="col-xl-3 col-md-6 mb-4">
+                <div style="user-select:none;" class="card border-left-warning shadow h-100 py-2">
+                    <div class="card-body vertical-center justify-content-between">
+                        <div class="row w-100 no-gutters align-items-center">
+                            <div class="col mr-2">
+                                <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                    Friends With Most Mutual Groups
+                                </div>
+                                <div class="h5 mb-0 font-weight-bold text-gray-800">@Model.MostMutualGroups.First().FirstName @Model.MostMutualGroups.First().LastName.Substring(0, 1).</div>
+                            </div>
+                            <div class="col-auto">
+                                <i class="fas fa-address-book fa-2x text-gray-300"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+
 </div>
+

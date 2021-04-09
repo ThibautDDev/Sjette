@@ -1,0 +1,21 @@
+﻿/*HOVER attribute change*/
+.hover:hover h4 {
+    font-weight: 900 !important;
+    text-decoration: none;
+}
+
+.hover:hover {
+    font-weight: 900 !important;
+    text-decoration: none;
+}
+
+.hoverHeader:hover {
+    background-color: #edf0f7;
+}
+
+
+/*CardFix*/
+.vertical-center {
+    display: flex;
+    align-items: center;
+}

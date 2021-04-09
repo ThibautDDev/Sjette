@@ -7,7 +7,7 @@ namespace Sjette.Models
 {
     // DashboardData model to pass multiple models in 1 combined one.
     // Also used to combine all razor code and variables.
-    // Not the most efficient but cleanest if you would ask me.
+    // Not the most efficient but cleanest way to code.
     public class DashboardData
     {
         // ObjectProperties
