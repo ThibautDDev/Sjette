@@ -71,8 +71,7 @@ function updateData(el, step, groupName, activity) {
     //console.log(LineChartData[groupName][activity])
 
     myLineChart.data.datasets[0].data = LineChartData[groupName][activity]
-    if (activity == "Calories") myLineChart.data.datasets[0].label = "Calories"
-    if (activity == "Distance") myLineChart.data.datasets[0].label = "Distance"
+    myLineChart.data.datasets[0].label = "Activities"
     myLineChart.update()
     //console.log()
 }
