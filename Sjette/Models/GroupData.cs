@@ -23,11 +23,18 @@ namespace Sjette.Models
         public List<Users> MostMutualGroups { get; set; }
 
 
+        // LineCharts
+        public Dictionary<string, Dictionary<string, List<int>>> LineChartData { get; set; }
+
+
         // Constructor
         public GroupData(Users user, List<Groups> groups, List<Activities> activities, 
             Dictionary<int, List<Activities>> groupActivities, 
             Dictionary<int, List<Users>>  allUsersOfGroup, List<Users> mutualUsers)
         {
+            string[] array1 = { "Activities", "Hiking", "Cycling", "Running", "Calories", "Distance"};
+            List<string> listOfLineChartProperties = new List<string>(array1);
+
             this.User = user;
             this.UserActivities = activities;
             this.UserGroups = groups;
@@ -36,6 +43,8 @@ namespace Sjette.Models
 
             setGroupsCreated();
             setMostMutualGroups(mutualUsers);
+
+            SetLineChartData(listOfLineChartProperties);
             //System.Diagnostics.Debugger.Break();
         }
 
@@ -70,6 +79,39 @@ namespace Sjette.Models
 
             this.MostMutualGroups = returnLst;
         }
+
+
+        // Set data of an user for the lineChart
+        private void SetLineChartData(List<string> properties)
+        {
+            var tempDictBeforeReturn = new Dictionary<string, Dictionary<string, List<int>>>();
+            foreach (var group in UserGroups)
+            {
+                var tempDictionary = new Dictionary<string, List<int>>();
+                foreach (var property in properties)
+                {
+                    var lst = new List<int>(new int[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
+                    foreach (var activity in ActivitiesOfAllGroups[group.pk_GroupID]) 
+                    {
+                        var x = (DateTime.Now - activity.StartTime).TotalDays;
+                        if (x < 365 && x > 0)
+                        {
+                            var month = activity.StartTime.Month - 1;
+                            var prev = lst[month];
+                            if (property == "Activities" || activity.ActivityType == property) lst[month] = prev + 1;
+                            if (property == "Calories") lst[month] = prev + activity.TotalCalories;
+                            if (property == "Distance") lst[month] = prev + Convert.ToInt32(activity.TKm);
+                        }
+                        
+                    }
+                tempDictionary[property] = lst;
+                }
+            tempDictBeforeReturn[group.GroupName] = tempDictionary;
+            }
+            this.LineChartData = tempDictBeforeReturn;
+        }
+
+
 
 
     }

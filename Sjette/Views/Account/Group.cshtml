@@ -14,6 +14,19 @@
 }
 
 @section Scripts{
+    <script type="text/javascript">
+
+        var LineChartData = @Html.Raw(Json.Serialize(Model.LineChartData))
+        var chartData = []
+        if (Object.keys(LineChartData).length > 0) {
+            var firstGroup = Object.keys(LineChartData)[0]
+            chartData = LineChartData[firstGroup]["Activities"]
+        }
+        var amountOfGroups = @Html.Raw(Json.Serialize(Model.LineChartData.Keys.Count))
+    </script>
+
+    <script src="~/lib/chart.js/Chart.min.js"></script>
+    <script src="~/js/charts/chart-area-dynamic.js"></script>
     <script src="~/js/group.js"></script>
 }
 
@@ -62,50 +75,31 @@
 
         @if (Model.AllUsersOfGroup != null)
         {
-            int i = -1;
+            int a = -1;
             <div class="col-xl-3 col-md-6 mb-4">
                 <div style="cursor:pointer; user-select:none;" class="card border-left-info shadow h-100 py-2">
                     @foreach (var userListItem in Model.AllUsersOfGroup)
                     {
-                        int j = ++i + 1;
+                        int j = ++a + 1;
                         int groupId = userListItem.Key;
                         var userList = userListItem.Value;
                         if (userList == Model.AllUsersOfGroup.Values.Last())
                         {
                             j = 0;
                         }
-                        @if (i == 0)
-                        {
-                            <div onclick="changeGroupCard(@i, @j)" class="groupCards card-body vertical-center justify-content-between">
-                                <div class="row w-100 no-gutters align-items-center">
-                                    <div class="col mr-2">
-                                        <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
-                                            Members - @Model.UserGroups.FirstOrDefault(obj => obj.pk_GroupID == groupId).GroupName
-                                        </div>
-                                        <div class="h5 mb-0 font-weight-bold text-gray-800">@userList.Count</div>
+                        <div onclick="changeGroupCard(@a, @j)" class="groupCards card-body vertical-center justify-content-between @(a==0?"":"d-none")">
+                            <div class="row w-100 no-gutters align-items-center">
+                                <div class="col mr-2">
+                                    <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                        Members - @Model.UserGroups.FirstOrDefault(obj => obj.pk_GroupID == groupId).GroupName
                                     </div>
-                                    <div class="col-auto">
-                                        <i class="fas fa-bullhorn fa-2x text-gray-300"></i>
-                                    </div>
+                                    <div class="h5 mb-0 font-weight-bold text-gray-800">@userList.Count</div>
+                                </div>
+                                <div class="col-auto">
+                                    <i class="fas fa-bullhorn fa-2x text-gray-300"></i>
                                 </div>
                             </div>
-                        }
-                        else
-                        {
-                            <div onclick="changeGroupCard(@i, @j)" class="d-none groupCards card-body vertical-center justify-content-between">
-                                <div class="row w-100 no-gutters align-items-center">
-                                    <div class="col mr-2">
-                                        <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
-                                            Members - @Model.UserGroups.FirstOrDefault(obj => obj.pk_GroupID == groupId).GroupName
-                                        </div>
-                                        <div class="h5 mb-0 font-weight-bold text-gray-800">@userList.Count</div>
-                                    </div>
-                                    <div class="col-auto">
-                                        <i class="fas fa-bullhorn fa-2x text-gray-300"></i>
-                                    </div>
-                                </div>
-                            </div>
-                        }
+                        </div>
                     }
                 </div>
             </div>
@@ -114,51 +108,30 @@
 
         @if (Model.MostMutualGroups.Count > 1)
         {
-            int i = -1;
+            int b = -1;
             <div class="col-xl-3 col-md-6 mb-4">
                 <div style="cursor:pointer; user-select:none;" class="card border-left-warning shadow h-100 py-2">
-
                     @foreach (var user in Model.MostMutualGroups)
                     {
-                        int j = ++i + 1;
+                        int j = ++b + 1;
                         if (user == Model.MostMutualGroups.Last())
                         {
                             j = 0;
                         }
-                        @if (i == 0)
-                        {
-                            <div onclick="changeMutualFriendsCard(@i, @j)" class="mutualFriendsCard card-body vertical-center justify-content-between">
-                                <div class="row w-100 no-gutters align-items-center">
-                                    <div class="col mr-2">
-                                        <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
-                                            Friends With Most Mutual Groups
-                                        </div>
-                                        <div class="h5 mb-0 font-weight-bold text-gray-800">@user.FirstName @user.LastName.Substring(0, 1).</div>
+                        <div onclick="changeMutualFriendsCard(@b, @j)" class="mutualFriendsCard card-body vertical-center justify-content-between @(b==0?"":"d-none")">
+                            <div class="row w-100 no-gutters align-items-center">
+                                <div class="col mr-2">
+                                    <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                        Friends With Most Mutual Groups
                                     </div>
-                                    <div class="col-auto">
-                                        <i class="fas fa-address-book fa-2x text-gray-300"></i>
-                                    </div>
+                                    <div class="h5 mb-0 font-weight-bold text-gray-800">@user.FirstName @user.LastName.Substring(0, 1).</div>
+                                </div>
+                                <div class="col-auto">
+                                    <i class="fas fa-address-book fa-2x text-gray-300"></i>
                                 </div>
                             </div>
-                        }
-                        else
-                        {
-                            <div onclick="changeMutualFriendsCard(@i, @j)" class="d-none mutualFriendsCard card-body vertical-center justify-content-between">
-                                <div class="row w-100 no-gutters align-items-center">
-                                    <div class="col mr-2">
-                                        <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
-                                            Friends With Most Mutual Groups
-                                        </div>
-                                        <div class="h5 mb-0 font-weight-bold text-gray-800">@user.FirstName @user.LastName.Substring(0, 1).</div>
-                                    </div>
-                                    <div class="col-auto">
-                                        <i class="fas fa-address-book fa-2x text-gray-300"></i>
-                                    </div>
-                                </div>
-                            </div>
-                        }
+                        </div>
                     }
-
                 </div>
             </div>
         }
@@ -184,5 +157,66 @@
         }
     </div>
 
-</div>
+    <div class="row">
+        <div class="vertical-tabs w-100">
+            <ul class="nav nav-tabs" role="tablist">
+                @{int d = 0;}
+                @foreach (var group in Model.UserGroups)
+                {
+                    <li class="nav-item">
+                        <a onclick="updateData(this, @d, '@group.GroupName', 'Activities')" class="nav-link @(group==Model.UserGroups.FirstOrDefault()?"active":"")" data-toggle="tab" href="#tab_@group.pk_GroupID" role="tab">@group.GroupName</a>
+                    </li>
+                    d+=6;
+                }
 
+            </ul>
+            <div class="tab-content w-100">
+                @{int c = 0;}
+                @foreach (var group in Model.UserGroups)
+                {
+                    <div class="tab-pane @(group==Model.UserGroups.FirstOrDefault()?"active":"")" id="tab_@group.pk_GroupID" role="tabpanel">
+                        <div class="row">
+                            <div class="col-xl-12 col-lg-12">
+                                <div class="card shadow mb-4">
+                                    <div onclick="changeData(0, 1, @c, '@group.GroupName', 'Cycling')" style="cursor:pointer; user-select:none;" class="lineChartHeaders card-header py-3 d-flex flex-row align-items-center justify-content-between hoverHeader">
+                                        <h6 class="m-0 font-weight-bold text-primary">Total Activities (Monthly)</h6>
+                                    </div>
+                                    <div onclick="changeData(1, 2, @c, '@group.GroupName', 'Running')" style="cursor:pointer; user-select:none;" class="lineChartHeaders card-header py-3 flex-row align-items-center justify-content-between d-none hoverHeader">
+                                        <h6 class="m-0 font-weight-bold text-primary">Total Cycling Activities (Monthly)</h6>
+                                    </div>
+                                    <div onclick="changeData(2, 3, @c, '@group.GroupName', 'Hiking')" style="cursor:pointer; user-select:none;" class="lineChartHeaders card-header py-3 flex-row align-items-center justify-content-between d-none hoverHeader">
+                                        <h6 class="m-0 font-weight-bold text-primary">Total Running Activities (Monthly)</h6>
+                                    </div>
+                                    <div onclick="changeData(3, 4, @c, '@group.GroupName', 'Calories')" style="cursor:pointer; user-select:none;" class="lineChartHeaders card-header py-3 flex-row align-items-center justify-content-between d-none hoverHeader">
+                                        <h6 class="m-0 font-weight-bold text-primary">Total Hiking Activities (Monthly)</h6>
+                                    </div>
+                                    <div onclick="changeData(4, 5, @c, '@group.GroupName', 'Distance')" style="cursor:pointer; user-select:none;" class="lineChartHeaders card-header py-3 flex-row align-items-center justify-content-between d-none hoverHeader">
+                                        <h6 class="m-0 font-weight-bold text-primary">Total Calories (Monthly)</h6>
+                                    </div>
+                                    <div onclick="changeData(5, 0, @c, '@group.GroupName', 'Activities')" style="cursor:pointer; user-select:none;" class="lineChartHeaders card-header py-3 flex-row align-items-center justify-content-between d-none hoverHeader">
+                                        <h6 class="m-0 font-weight-bold text-primary">Total Distance (Monthly)</h6>
+                                    </div>
+
+                                    <div class="card-body">
+                                        <div class="chart-area">
+                                            <canvas class="lineCharts"></canvas>
+                                        </div>
+                                    </div>
+                                    @{c += 6;}
+                                </div>
+                            </div>
+                        </div>
+
+
+
+
+
+
+
+
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
