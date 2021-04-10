@@ -28,6 +28,7 @@
     <script src="~/lib/chart.js/Chart.min.js"></script>
     <script src="~/js/charts/chart-area-dynamic.js"></script>
     <script src="~/js/group.js"></script>
+    <script src="~/js/sortTableGroup.js"></script>
 }
 
 
@@ -168,7 +169,9 @@
                     </li>
                     d += 6;
                 }
-
+                <li class="nav-item">
+                    <a class="nav-link" asp-controller="Account" asp-action="CreateGroup"><b>Create a new group</b></a>
+                </li>
             </ul>
             <div class="tab-content w-100">
                 @*GRAFIEK*@
@@ -234,13 +237,13 @@
                                     <div class="card-body">
                                         <div class="tab-content" id="myTabContent">
                                             <div class="tab-pane fade show active" id="table1_@group.pk_GroupID" role="tabpanel">
-                                                <table class="table table-hover table-sm mb-0">
+                                                <table class="table table-hover table-sm mb-0" id="table1_@group.GroupName">
                                                     <thead>
                                                         <tr>
                                                             @{ int e = 0;}
                                                             @foreach (var header in Model.TableHeaders["Cycling"])
                                                             {
-                                                                <th onclick="sortTable(@e)" scope="col">@header</th>
+                                                                <th style="cursor:pointer; user-select:none;" onclick="sortTable(@e, 'table1_@group.GroupName')" scope="col">@header</th>
                                                                 e++;
                                                             }
                                                         </tr>
@@ -270,13 +273,13 @@
                                             </div>
 
                                             <div class="tab-pane fade" id="table2_@group.pk_GroupID" role="tabpanel">
-                                                <table class="table table-hover table-sm mb-0">
+                                                <table class="table table-hover table-sm mb-0" id="table2_@group.GroupName">
                                                     <thead>
                                                         <tr>
                                                             @{ e = 0;}
                                                             @foreach (var header in Model.TableHeaders["Running"])
                                                             {
-                                                                <th onclick="sortTable(@e)" scope="col">@header</th>
+                                                                <th style="cursor:pointer; user-select:none;" onclick="sortTable(@e, 'table2_@group.GroupName')" scope="col">@header</th>
                                                                 e++;
                                                             }
                                                         </tr>
@@ -305,13 +308,13 @@
                                                 </table>
                                             </div>
                                             <div class="tab-pane fade" id="table3_@group.pk_GroupID" role="tabpanel">
-                                                <table class="table table-hover table-sm mb-0">
+                                                <table class="table table-hover table-sm mb-0" id="table3_@group.GroupName">
                                                     <thead>
                                                         <tr>
                                                             @{ e = 0;}
                                                             @foreach (var header in Model.TableHeaders["Hiking"])
                                                             {
-                                                                <th onclick="sortTable(@e)" scope="col">@header</th>
+                                                                <th style="cursor:pointer; user-select:none;" onclick="sortTable(@e, 'table3_@group.GroupName')" scope="col">@header</th>
                                                                 e++;
                                                             }
                                                         </tr>
@@ -319,22 +322,22 @@
                                                     <tbody>
                                                         @foreach (var dict in Model.TableData[group.pk_GroupID]["Hiking"])
                                                         {
-                                                        <tr>
-                                                            <td scope="row">@dict.Key</td>
-                                                            @{ int f = 0;}
-                                                            @foreach (var item in dict.Value)
-                                                            {
-                                                                @if (f == 1)
+                                                            <tr>
+                                                                <td scope="row">@dict.Key</td>
+                                                                @{ int f = 0;}
+                                                                @foreach (var item in dict.Value)
                                                                 {
-                                                                    <td>@TimeSpan.FromMinutes(item)</td>
+                                                                    @if (f == 1)
+                                                                    {
+                                                                        <td>@TimeSpan.FromMinutes(item)</td>
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <td>@item</td>
+                                                                    }
+                                                                    f++;
                                                                 }
-                                                                else
-                                                                {
-                                                                    <td>@item</td>
-                                                                }
-                                                                f++;
-                                                            }
-                                                        </tr>
+                                                            </tr>
                                                         }
                                                     </tbody>
                                                 </table>
