@@ -166,11 +166,12 @@
                     <li class="nav-item">
                         <a onclick="updateData(this, @d, '@group.GroupName', 'Activities')" class="nav-link @(group==Model.UserGroups.FirstOrDefault()?"active":"")" data-toggle="tab" href="#tab_@group.pk_GroupID" role="tab">@group.GroupName</a>
                     </li>
-                    d+=6;
+                    d += 6;
                 }
 
             </ul>
             <div class="tab-content w-100">
+                @*GRAFIEK*@
                 @{int c = 0;}
                 @foreach (var group in Model.UserGroups)
                 {
@@ -208,6 +209,68 @@
                         </div>
 
 
+                        @*TABEL*@
+                        <div class="row">
+                            <div class="col-lg-12 mb-4">
+                                <div class="card shadow mb-4">
+                                    <div class="card-header py-3 d-flex justify-content-between">
+                                        <h6 class="m-0 font-weight-bold text-primary py-0 my-auto">
+                                            Ranking Of Members - @group.GroupName
+                                        </h6>
+                                        <ul class="nav nav-pills m-0 p-0 py-1" role="tablist">
+                                            <li class="nav-item">
+                                                <a class="nav-link active" data-toggle="tab" href="#table1_@group.pk_GroupID" role="tab">Cycling</a>
+                                            </li>
+                                            <li class="nav-item">
+                                                <a class="nav-link" data-toggle="tab" href="#table2_@group.pk_GroupID" role="tab">Running</a>
+                                            </li>
+                                            <li class="nav-item">
+                                                <a class="nav-link" data-toggle="tab" href="#table3_@group.pk_GroupID" role="tab">Hiking</a>
+                                            </li>
+
+                                        </ul>
+
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="tab-content" id="myTabContent">
+                                            <div class="tab-pane fade show active" id="table1_@group.pk_GroupID" role="tabpanel">
+                                                <table class="table table-hover table-sm mb-0">
+                                                    <thead>
+                                                        <tr>
+                                                            @{ int e = 0;}
+                                                            @foreach (var header in Model.TableHeaders["Cycling"])
+                                                            {
+                                                                <th onclick="sortTable(@e)" scope="col">@header</th>
+                                                                e++;
+                                                            }
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        @foreach (var tuple in Model.TableData[group.pk_GroupID]["Cycling"])
+                                                        {
+                                                            <tr>
+                                                                <td scope="row">@tuple.Item1</td>
+                                                                @foreach (var item in tuple.Item2)
+                                                                {
+                                                                    <td>@item</td>
+                                                                }
+                                                            </tr>
+                                                        }
+                                                    </tbody>
+                                                </table>
+                                            </div>
+
+                                            <div class="tab-pane fade" id="table2_@group.pk_GroupID" role="tabpanel">
+                                                Running
+                                            </div>
+                                            <div class="tab-pane fade" id="table3_@group.pk_GroupID" role="tabpanel">
+                                                Hiking
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
 
 
 

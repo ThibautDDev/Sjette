@@ -27,6 +27,10 @@ namespace Sjette.Models
         public Dictionary<string, Dictionary<string, List<int>>> LineChartData { get; set; }
 
 
+        // Table
+        public Dictionary<string, List<string>> TableHeaders {get; set;}                                         //Activity -  Headers
+        public Dictionary<int, Dictionary<string, List<Tuple<string, List<int>>> >> TableData { get; set; }      //GroupId  -  Dict<Activity - List(UserName - List<numbers>>)
+
         // Constructor
         public GroupData(Users user, List<Groups> groups, List<Activities> activities, 
             Dictionary<int, List<Activities>> groupActivities, 
@@ -45,6 +49,9 @@ namespace Sjette.Models
             setMostMutualGroups(mutualUsers);
 
             SetLineChartData(listOfLineChartProperties);
+
+            SetTableHeaders();
+            SetTableData();
             //System.Diagnostics.Debugger.Break();
         }
 
@@ -112,7 +119,33 @@ namespace Sjette.Models
         }
 
 
+        private void SetTableHeaders()
+        {
+            string[] array1 = { "Name", "Amount", "Longest Ride", "Total Distance", "Total Calories", "Fastest 50km", "Fastest 100km"};
+            string[] array2 = { "Name", "Amount", "Longest Run", "Total Distance", "Total Calories", "Fastest 5km", "Fastest 10km", "Fastest 21.1km", "Fastest 42.2km" };
+            string[] array3 = { "Name", "Amount", "Hikes 10km+", "Hikes 25km+", "Hikes 100km+", "Total Distance", "Total Calories"};
 
+            var tempDictBeforeReturn = new Dictionary<string, List<string>>();
+            var list1 = new List<string>(array1);
+            var list2 = new List<string>(array2);
+            var list3 = new List<string>(array3);
+
+            tempDictBeforeReturn["Cycling"] = list1;
+            tempDictBeforeReturn["Running"] = list2;
+            tempDictBeforeReturn["Hiking"] = list3;
+
+            this.TableHeaders = tempDictBeforeReturn;
+        }
+
+
+        private void SetTableData()
+        {
+            var tempDictBeforeReturn = new Dictionary<int, Dictionary<string, List<Tuple<string, List<int>>> >>();
+            foreach (var item in ActivitiesOfAllGroups)
+            {
+
+            }
+        }
 
     }
 }
