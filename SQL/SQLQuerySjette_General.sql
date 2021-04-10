@@ -9,17 +9,21 @@
 --    DROP COLUMN <ColumnName>
 -- 5) INSERT INTO <TableName> (<DataType>, ...)
 --    VALUES (<Data, ...)
-TRUNCATE TABLE Groups
-DROP TABLE GroupMembership
-DROP TABLE Activities
-DROP TABLE Groups
-DROP TABLE [Users]
-
 
 --First Command
 --Initialize Database 'Sjette'
-CREATE DATABASE Sjette
+IF NOT EXISTS(SELECT * FROM sys.databases WHERE name = 'Sjette')
+BEGIN
+	CREATE DATABASE Sjette
+END
+GO
 
+USE Sjette
+GO
+DROP TABLE IF EXISTS [GroupMembership];
+DROP TABLE IF EXISTS [Activities];
+DROP TABLE IF EXISTS [Groups];
+DROP TABLE IF EXISTS [Users];
 
 
 --Second Command
@@ -75,7 +79,7 @@ CREATE TABLE [Groups] (
 	GroupName		NVARCHAR(255) NOT NULL
 )
 
-CREATE TABLE GroupMembership (
+CREATE TABLE [GroupMembership] (
 	--Int		GroupID		ID that references to the group of the user
 	--Int		UserID		ID that references to the user who created the group
     UserID INT NOT NULL,
@@ -84,4 +88,3 @@ CREATE TABLE GroupMembership (
     FOREIGN KEY (UserID) REFERENCES Users (pk_UserID),
     FOREIGN KEY (GroupID) REFERENCES Groups (pk_GroupID),
 )
-

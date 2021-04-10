@@ -6,8 +6,8 @@
     var routeUrl = Url.RouteUrl(ViewContext.RouteData.Values);
     var qsPath = ViewContext.HttpContext.Request.QueryString.Value;
     var url = $"{routeUrl}{qsPath}";
-
 }
+
 
 @section Styles{
     <link href="~/css/group.css" rel="stylesheet" type="text/css" />
@@ -246,13 +246,22 @@
                                                         </tr>
                                                     </thead>
                                                     <tbody>
-                                                        @foreach (var tuple in Model.TableData[group.pk_GroupID]["Cycling"])
+                                                        @foreach (var dict in Model.TableData[group.pk_GroupID]["Cycling"])
                                                         {
                                                             <tr>
-                                                                <td scope="row">@tuple.Item1</td>
-                                                                @foreach (var item in tuple.Item2)
+                                                                <td scope="row">@dict.Key</td>
+                                                                @{ int f = 0;}
+                                                                @foreach (var item in dict.Value)
                                                                 {
-                                                                    <td>@item</td>
+                                                                    @if (f == 1 || f == 4 || f == 5)
+                                                                    {
+                                                                        <td>@TimeSpan.FromMinutes(item)</td>
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <td>@item</td>
+                                                                    }
+                                                                    f++;
                                                                 }
                                                             </tr>
                                                         }
@@ -261,22 +270,80 @@
                                             </div>
 
                                             <div class="tab-pane fade" id="table2_@group.pk_GroupID" role="tabpanel">
-                                                Running
+                                                <table class="table table-hover table-sm mb-0">
+                                                    <thead>
+                                                        <tr>
+                                                            @{ e = 0;}
+                                                            @foreach (var header in Model.TableHeaders["Running"])
+                                                            {
+                                                                <th onclick="sortTable(@e)" scope="col">@header</th>
+                                                                e++;
+                                                            }
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        @foreach (var dict in Model.TableData[group.pk_GroupID]["Running"])
+                                                        {
+                                                            <tr>
+                                                                <td scope="row">@dict.Key</td>
+                                                                @{ int f = 0;}
+                                                                @foreach (var item in dict.Value)
+                                                                {
+                                                                    @if (f == 1 || f == 4 || f == 5 || f == 6 || f == 7)
+                                                                    {
+                                                                        <td>@TimeSpan.FromMinutes(item)</td>
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <td>@item</td>
+                                                                    }
+                                                                    f++;
+                                                                }
+                                                            </tr>
+                                                        }
+                                                    </tbody>
+                                                </table>
                                             </div>
                                             <div class="tab-pane fade" id="table3_@group.pk_GroupID" role="tabpanel">
-                                                Hiking
+                                                <table class="table table-hover table-sm mb-0">
+                                                    <thead>
+                                                        <tr>
+                                                            @{ e = 0;}
+                                                            @foreach (var header in Model.TableHeaders["Hiking"])
+                                                            {
+                                                                <th onclick="sortTable(@e)" scope="col">@header</th>
+                                                                e++;
+                                                            }
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        @foreach (var dict in Model.TableData[group.pk_GroupID]["Hiking"])
+                                                        {
+                                                        <tr>
+                                                            <td scope="row">@dict.Key</td>
+                                                            @{ int f = 0;}
+                                                            @foreach (var item in dict.Value)
+                                                            {
+                                                                @if (f == 1)
+                                                                {
+                                                                    <td>@TimeSpan.FromMinutes(item)</td>
+                                                                }
+                                                                else
+                                                                {
+                                                                    <td>@item</td>
+                                                                }
+                                                                f++;
+                                                            }
+                                                        </tr>
+                                                        }
+                                                    </tbody>
+                                                </table>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-
-
-
-
-
-
                     </div>
                 }
             </div>

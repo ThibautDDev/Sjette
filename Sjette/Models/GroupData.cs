@@ -29,7 +29,7 @@ namespace Sjette.Models
 
         // Table
         public Dictionary<string, List<string>> TableHeaders {get; set;}                                         //Activity -  Headers
-        public Dictionary<int, Dictionary<string, List<Tuple<string, List<int>>> >> TableData { get; set; }      //GroupId  -  Dict<Activity - List(UserName - List<numbers>>)
+        public Dictionary<int, Dictionary<string, Dictionary<string, List<int>> >> TableData { get; set; }       //GroupId  -  Dict<Activity - Dict<Username - List<numbers>>>
 
         // Constructor
         public GroupData(Users user, List<Groups> groups, List<Activities> activities, 
@@ -123,7 +123,7 @@ namespace Sjette.Models
         {
             string[] array1 = { "Name", "Amount", "Longest Ride", "Total Distance", "Total Calories", "Fastest 50km", "Fastest 100km"};
             string[] array2 = { "Name", "Amount", "Longest Run", "Total Distance", "Total Calories", "Fastest 5km", "Fastest 10km", "Fastest 21.1km", "Fastest 42.2km" };
-            string[] array3 = { "Name", "Amount", "Hikes 10km+", "Hikes 25km+", "Hikes 100km+", "Total Distance", "Total Calories"};
+            string[] array3 = { "Name", "Amount", "Longest Hike", "Total Distance", "Total Calories", "Hikes 10km+", "Hikes 25km+", "Hikes 100km+"};
 
             var tempDictBeforeReturn = new Dictionary<string, List<string>>();
             var list1 = new List<string>(array1);
@@ -137,14 +137,173 @@ namespace Sjette.Models
             this.TableHeaders = tempDictBeforeReturn;
         }
 
+        private Users getUserFromId(int id)
+        {
+            foreach(var group in AllUsersOfGroup)
+            {
+                var groupId = group.Key;
+                foreach (var user in group.Value) if (id == user.pk_UserID) return user;
+            }
+            return null;
+        }
 
+        private int calculateTime(TimeSpan timeDone, decimal distanceDoneDecimal, double distanceNeeded)
+        {
+            double distanceDone = Decimal.ToDouble(distanceDoneDecimal);
+            if (distanceDone < distanceNeeded) return 0;
+            return (int)(((double)distanceNeeded / distanceDone) * (int) timeDone.TotalMinutes);
+        }
+
+
+        //GroupId  -  Dict<Activity - Dict<UserName - List<numbers>
         private void SetTableData()
         {
-            var tempDictBeforeReturn = new Dictionary<int, Dictionary<string, List<Tuple<string, List<int>>> >>();
+            var tempDictBeforeReturn = new Dictionary<int, Dictionary<string, Dictionary<string, List<int>> >>();
+            
             foreach (var item in ActivitiesOfAllGroups)
             {
+                var groupId = item.Key;
+                var activities = item.Value;
 
+                var dictActivities = new Dictionary<string, Dictionary<string, List<int>>>();
+
+                
+                
+                foreach (var activity in activities)
+                {
+                    // Check and make userDict
+                    Dictionary<string, List<int>> userDict;
+                    bool dictionaryExist = dictActivities.ContainsKey(activity.ActivityType);
+                    if (dictionaryExist) userDict = dictActivities[activity.ActivityType];
+                    else userDict = new Dictionary<string, List<int>>();
+
+                    //Cycling
+                    if (activity.ActivityType == "Cycling")
+                    {
+                        var user = getUserFromId(activity.fk_UserID);
+                        var keyUsername = $"{user.FirstName} {user.LastName.Substring(0, 1)}.";
+                        List<int> prev;
+                        bool keyExist = userDict.TryGetValue(keyUsername, out prev);
+                        if (keyExist)
+                        {
+                            int time50km = calculateTime(activity.TTime, activity.TKm, 50.0);
+                            int time100km = calculateTime(activity.TTime, activity.TKm, 100.0);
+                            prev[0] += 1;
+                            if (prev[1] < activity.TTime.TotalMinutes) prev[1] = (int)activity.TTime.TotalMinutes;
+                            prev[2] += (int)activity.TKm;
+                            prev[3] += activity.TotalCalories;
+                            if (prev[4] < time50km) prev[4] = time50km;
+                            if (prev[5] < time100km) prev[5] = time100km;
+                        }
+                        else
+                        {
+                            prev = new List<int>();
+                            int time50km = calculateTime(activity.TTime, activity.TKm, 50.0);
+                            int time100km = calculateTime(activity.TTime, activity.TKm, 100.0);
+                            prev.Add(1);
+                            prev.Add((int)activity.TTime.TotalMinutes);
+                            prev.Add((int)activity.TKm);
+                            prev.Add(activity.TotalCalories);
+                            prev.Add(time50km);
+                            prev.Add(time100km);
+                        }
+                        userDict[keyUsername] = prev;
+                        dictActivities[activity.ActivityType] = userDict;
+                    }
+                    // Running
+                    else if (activity.ActivityType == "Running")
+                    {
+                        var user = getUserFromId(activity.fk_UserID);
+                        var keyUsername = $"{user.FirstName} {user.LastName.Substring(0, 1)}.";
+                        List<int> prev;
+                        bool keyExist = userDict.TryGetValue(keyUsername, out prev);
+                        if (keyExist)
+                        {
+                            int time5km = calculateTime(activity.TTime, activity.TKm, 5.0);
+                            int time10km = calculateTime(activity.TTime, activity.TKm, 10.0);
+                            int time21_1km = calculateTime(activity.TTime, activity.TKm, 21.1);
+                            int time42_2km = calculateTime(activity.TTime, activity.TKm, 42.2);
+                            prev[0] += 1;
+                            if (prev[1] < activity.TTime.TotalMinutes) prev[1] = (int)activity.TTime.TotalMinutes;
+                            prev[2] += (int)activity.TKm;
+                            prev[3] += activity.TotalCalories;
+                            if (prev[4] < time5km) prev[4] = time5km;
+                            if (prev[5] < time10km) prev[5] = time10km;
+                            if (prev[6] < time21_1km) prev[6] = time21_1km;
+                            if (prev[7] < time42_2km) prev[7] = time42_2km;
+                        }
+                        else 
+                        {
+                            prev = new List<int>();
+                            int time5km = calculateTime(activity.TTime, activity.TKm, 5.0);
+                            int time10km = calculateTime(activity.TTime, activity.TKm, 10.0);
+                            int time21_1km = calculateTime(activity.TTime, activity.TKm, 21.1);
+                            int time42_2km = calculateTime(activity.TTime, activity.TKm, 42.2);
+                            prev.Add(1);
+                            prev.Add((int)activity.TTime.TotalMinutes);
+                            prev.Add((int)activity.TKm);
+                            prev.Add(activity.TotalCalories);
+                            prev.Add(time5km);
+                            prev.Add(time10km);
+                            prev.Add(time21_1km);
+                            prev.Add(time42_2km);
+                        }
+                        userDict[keyUsername] = prev;
+                        dictActivities[activity.ActivityType] = userDict;
+                    } else if (activity.ActivityType == "Hiking")
+                    {
+                        var user = getUserFromId(activity.fk_UserID);
+                        var keyUsername = $"{user.FirstName} {user.LastName.Substring(0, 1)}.";
+                        List<int> prev;
+                        bool keyExist = userDict.TryGetValue(keyUsername, out prev);
+                        if (keyExist)
+                        {
+                            prev[0] += 1;
+                            if (prev[1] < activity.TTime.TotalMinutes) prev[1] = (int)activity.TTime.TotalMinutes;
+                            prev[2] += (int)activity.TKm;
+                            prev[3] += activity.TotalCalories;
+                            if ((int)activity.TKm >= 10) prev[4]++;
+                            if ((int)activity.TKm >= 25) prev[5]++;
+                            if ((int)activity.TKm >= 100) prev[6]++;
+                        }
+                        else
+                        {
+                            prev = new List<int>();
+                            prev.Add(1);
+                            prev.Add((int)activity.TTime.TotalMinutes);
+                            prev.Add((int)activity.TKm);
+                            prev.Add(activity.TotalCalories);
+                            if ((int)activity.TKm >= 10) 
+                            {
+                                prev.Add(1);
+                            } else prev.Add(0);
+                            if ((int)activity.TKm >= 25)
+                            {
+                                prev.Add(1);
+                            }
+                            else prev.Add(0);
+                            if ((int)activity.TKm >= 100)
+                            {
+                                prev.Add(1);
+                            }
+                            else prev.Add(0);
+                        }
+                        userDict[keyUsername] = prev;
+                        dictActivities[activity.ActivityType] = userDict;
+                    }
+                    tempDictBeforeReturn[groupId] = dictActivities;
+                }
+                this.TableData = tempDictBeforeReturn;
             }
+
+
+
+
+
+
+
+
+
         }
 
     }

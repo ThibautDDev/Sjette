@@ -64,7 +64,12 @@ namespace Sjette.Models
         private void SetTotalCalories()
         {
             int totalCalories = 0;
-            foreach (var item in UserActivities) totalCalories += item.TotalCalories;
+            foreach (var item in UserActivities)
+            {
+                var x = (DateTime.Now - item.StartTime).TotalDays;
+                if (x < 365 && x > 0) totalCalories += item.TotalCalories;
+            }
+
             this.TotalCalories = totalCalories;
         }
 
