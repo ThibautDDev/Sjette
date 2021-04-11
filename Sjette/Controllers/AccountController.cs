@@ -231,7 +231,6 @@ namespace Sjette.Controllers
         public async Task<IActionResult> Group()
         {
             setUserDictionairy();
-
             var id = Convert.ToInt32(UserDictionairy["UserID"]);
             var user = await getUserByIdAsync(_context, id);
             var groups = await getGroupsOfUserAsync(_context, user);

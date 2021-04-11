@@ -33,6 +33,7 @@
     font-size: 16px;
     max-height: 80px;
     width: 140px;
+    white-space: normal!important;
     overflow: hidden;
 }
 

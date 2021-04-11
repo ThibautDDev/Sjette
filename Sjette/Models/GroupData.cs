@@ -31,6 +31,7 @@ namespace Sjette.Models
         public Dictionary<string, List<string>> TableHeaders {get; set;}                                         //Activity -  Headers
         public Dictionary<int, Dictionary<string, Dictionary<string, List<int>> >> TableData { get; set; }       //GroupId  -  Dict<Activity - Dict<Username - List<numbers>>>
 
+
         // Constructor
         public GroupData(Users user, List<Groups> groups, List<Activities> activities, 
             Dictionary<int, List<Activities>> groupActivities, 
@@ -154,12 +155,11 @@ namespace Sjette.Models
             return (int)(((double)distanceNeeded / distanceDone) * (int) timeDone.TotalMinutes);
         }
 
-
         //GroupId  -  Dict<Activity - Dict<UserName - List<numbers>
         private void SetTableData()
         {
-            var tempDictBeforeReturn = new Dictionary<int, Dictionary<string, Dictionary<string, List<int>> >>();
-            
+            var tempDictBeforeReturn = new Dictionary<int, Dictionary<string, Dictionary<string, List<int>>>>();
+
             foreach (var item in ActivitiesOfAllGroups)
             {
                 var groupId = item.Key;
@@ -167,8 +167,8 @@ namespace Sjette.Models
 
                 var dictActivities = new Dictionary<string, Dictionary<string, List<int>>>();
 
-                
-                
+
+
                 foreach (var activity in activities)
                 {
                     // Check and make userDict
@@ -232,7 +232,7 @@ namespace Sjette.Models
                             if (prev[6] < time21_1km) prev[6] = time21_1km;
                             if (prev[7] < time42_2km) prev[7] = time42_2km;
                         }
-                        else 
+                        else
                         {
                             prev = new List<int>();
                             int time5km = calculateTime(activity.TTime, activity.TKm, 5.0);
@@ -250,7 +250,8 @@ namespace Sjette.Models
                         }
                         userDict[keyUsername] = prev;
                         dictActivities[activity.ActivityType] = userDict;
-                    } else if (activity.ActivityType == "Hiking")
+                    }
+                    else if (activity.ActivityType == "Hiking")
                     {
                         var user = getUserFromId(activity.fk_UserID);
                         var keyUsername = $"{user.FirstName} {user.LastName.Substring(0, 1)}.";
@@ -273,10 +274,11 @@ namespace Sjette.Models
                             prev.Add((int)activity.TTime.TotalMinutes);
                             prev.Add((int)activity.TKm);
                             prev.Add(activity.TotalCalories);
-                            if ((int)activity.TKm >= 10) 
+                            if ((int)activity.TKm >= 10)
                             {
                                 prev.Add(1);
-                            } else prev.Add(0);
+                            }
+                            else prev.Add(0);
                             if ((int)activity.TKm >= 25)
                             {
                                 prev.Add(1);
@@ -295,16 +297,10 @@ namespace Sjette.Models
                 }
                 this.TableData = tempDictBeforeReturn;
             }
-
-
-
-
-
-
-
-
-
         }
+
+
+
 
     }
 }

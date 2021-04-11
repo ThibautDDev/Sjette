@@ -2,9 +2,9 @@
     return /^-?\d+$/.test(value);
 }
 
-function sortTable(n, className) {
+function sortTable(n, objectName) {
     var table, rows, switching, i, x, y, shouldSwitch, dir, switchcount = 0;
-    table = document.getElementById(className)
+    table = document.getElementById(objectName)
     switching = true;
     // Set the sorting direction to ascending:
     dir = "asc";

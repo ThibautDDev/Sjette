@@ -469,43 +469,6 @@
 
                 </div>
             </div>
-
-
-            <div class="row">
-                <div class="col-lg-12 mb-4">
-                    <div class="card shadow mb-4">
-                        <div class="card-header py-3">
-                            <h6 class="m-0 font-weight-bold text-primary">Group - Quick Menu</h6>
-                        </div>
-
-                        <div class="card-body">
-                            <ul class="m-0 pl-3">
-                                <li>
-                                    <a class="hover" asp-controller="Account" asp-action="Group">
-                                        <p class="h6 hover text-secondary font-weight-bold">Group Overview</p>
-                                    </a>
-                                </li>
-                                <hr />
-                                <li>
-                                    <a class="hover" asp-controller="Account" asp-action="CreateGroup">
-                                        <p class="h6 hover text-secondary font-weight-bold">Create A Group</p>
-                                    </a>
-                                </li>
-                                <li>
-                                    <a class="hover" asp-controller="Account" asp-action="LeaveGroup">
-                                        <p class="h6 hover text-secondary font-weight-bold">Leave A Group</p>
-                                    </a>
-                                </li>
-                                <li>
-                                    <a class="hover" asp-controller="Account" asp-action="DeleteGroup">
-                                        <p class="h6 hover text-secondary font-weight-bold">Delete A Group</p>
-                                    </a>
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-            </div>
         </div>
 
         <div class="col-lg-6 mb-4">
@@ -526,32 +489,56 @@
             <!-- Approach -->
             <div class="card shadow mb-4">
                 <div class="card-header py-3">
-                    <h6 class="m-0 font-weight-bold text-primary">Activity - Quick Menu</h6>
+                    <h6 class="m-0 font-weight-bold text-primary">Quick Menu</h6>
                 </div>
                 <div class="card-body">
-                    <ul class="m-0 pl-3">
-                        <li>
-                            <a class="hover" asp-controller="Account" asp-action="Activity">
-                                <p class="h6 hover text-secondary font-weight-bold">Activity Overview</p>
-                            </a>
-                        </li>
-                        <hr />
-                        <li>
-                            <a class="hover" asp-controller="Account" asp-action="CreateActivity">
-                                <p class="h6 hover text-secondary font-weight-bold">Create An Activity</p>
-                            </a>
-                        </li>
-                        <li>
-                            <a class="hover" asp-controller="Account" asp-action="EditActivity">
-                                <p class="h6 hover text-secondary font-weight-bold">Edit An Activity</p>
-                            </a>
-                        </li>
-                        <li>
-                            <a class="hover" asp-controller="Account" asp-action="DeleteActivity">
-                                <p class="h6 hover text-secondary font-weight-bold">Delete An Activity</p>
-                            </a>
-                        </li>
-                    </ul>
+                    <div class="row">
+                        <div class="col-6">
+                            <ul class="m-0 pl-3">
+                                <li>
+                                    <a class="hover" asp-controller="Account" asp-action="Activity">
+                                        <p class="h6 hover text-secondary font-weight-bold">Activity Overview</p>
+                                    </a>
+                                </li>
+                                <hr />
+                                <li>
+                                    <a class="hover" asp-controller="Account" asp-action="CreateActivity">
+                                        <p class="h6 hover text-secondary font-weight-bold">Create An Activity</p>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="hover" asp-controller="Account" asp-action="EditActivity">
+                                        <p class="h6 hover text-secondary font-weight-bold">Edit An Activity</p>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="hover" asp-controller="Account" asp-action="DeleteActivity">
+                                        <p class="h6 hover text-secondary font-weight-bold">Delete An Activity</p>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="col-6">
+                            <ul class="m-0 pl-3">
+                                <li>
+                                    <a class="hover" asp-controller="Account" asp-action="Group">
+                                        <p class="h6 hover text-secondary font-weight-bold">Group Overview</p>
+                                    </a>
+                                </li>
+                                <hr />
+                                <li>
+                                    <a class="hover" asp-controller="Account" asp-action="CreateGroup">
+                                        <p class="h6 hover text-secondary font-weight-bold">Create A Group</p>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="hover" asp-controller="Account" asp-action="LeaveGroup">
+                                        <p class="h6 hover text-secondary font-weight-bold">Leave A Group</p>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
