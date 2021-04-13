@@ -76,15 +76,15 @@ CREATE TABLE [Groups] (
 	--Nvarchar	GroupName	Name of the group
 	pk_GroupID		INT IDENTITY(1,1) PRIMARY KEY NOT NULL,
 	fk_CreatorID	INT FOREIGN KEY REFERENCES Users(pk_UserID) NOT NULL,
-	GroupName		NVARCHAR(255) NOT NULL
+	GroupName		NVARCHAR(255) NOT NULL UNIQUE
 )
 
 CREATE TABLE [GroupMembership] (
 	--Int		GroupID		ID that references to the group of the user
 	--Int		UserID		ID that references to the user who created the group
+	GroupMembershipID INT IDENTITY(1, 1) PRIMARY KEY NOT NULL,
     UserID INT NOT NULL,
     GroupID INT NOT NULL,
-    PRIMARY KEY (UserID, GroupID),
     FOREIGN KEY (UserID) REFERENCES Users (pk_UserID),
     FOREIGN KEY (GroupID) REFERENCES Groups (pk_GroupID),
 )

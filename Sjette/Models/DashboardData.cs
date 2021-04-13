@@ -172,7 +172,8 @@ namespace Sjette.Models
 
                     var sortedKeys = tempRankingDict.OrderByDescending(x => x.Value).Select(kvp => kvp.Key).ToList();
                     var index = sortedKeys.IndexOf(User.pk_UserID);
-                    rankingDictionary[groupId] = new List<int>(new int[] { index + 1, tempRankingDict.Count, 100 * (tempRankingDict.Count - index - 1) / (tempRankingDict.Count - 1) });
+                    if (tempRankingDict.Count == 1) rankingDictionary[groupId] = new List<int>(new int[] { index + 1, tempRankingDict.Count, 100});
+                    else rankingDictionary[groupId] = new List<int>(new int[] { index + 1, tempRankingDict.Count, 100 * (tempRankingDict.Count - index - 1) / (tempRankingDict.Count - 1) });
                 }
                 tempDictBeforeReturn[property] = rankingDictionary;
             }

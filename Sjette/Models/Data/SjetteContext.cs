@@ -23,5 +23,8 @@ namespace Sjette.Models.Data
 
         // Initialize the Sjette-Groups constructor.
         public DbSet<Sjette.Models.Groups> Groups { get; set; }
+
+        // Initialize the Sjette-Groups constructor.
+        public DbSet<Sjette.Models.GroupMembership> GroupMembership { get; set; }
     }
 }

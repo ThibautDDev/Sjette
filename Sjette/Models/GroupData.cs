@@ -14,6 +14,7 @@ namespace Sjette.Models
         public Users User { get; set; }
         public List<Groups> UserGroups { get; set; }
         public Dictionary<int, List<Users>> AllUsersOfGroup { get; set; }
+        public Dictionary<string, List<Users>> AllUsersOfGroupByGroupName { get; set; }
         public List<Activities> UserActivities { get; set; }
         public Dictionary<int, List<Activities>> ActivitiesOfAllGroups { get; set; }
 
@@ -46,6 +47,8 @@ namespace Sjette.Models
             this.ActivitiesOfAllGroups = groupActivities;
             this.AllUsersOfGroup = allUsersOfGroup;
 
+            setAllUsersOfGroupByGroupName();
+
             setGroupsCreated();
             setMostMutualGroups(mutualUsers);
 
@@ -54,6 +57,20 @@ namespace Sjette.Models
             SetTableHeaders();
             SetTableData();
             //System.Diagnostics.Debugger.Break();
+        }
+
+
+        private void setAllUsersOfGroupByGroupName()
+        {
+            var dictBeforeReturn = new Dictionary<string, List<Users>>();
+            foreach (var item in AllUsersOfGroup)
+            {
+                int groupId = item.Key;
+                var group = UserGroups.Find(x => x.pk_GroupID == groupId);
+                var userList = item.Value;
+                dictBeforeReturn[group.GroupName] = userList;
+            }
+            this.AllUsersOfGroupByGroupName = dictBeforeReturn;
         }
 
 

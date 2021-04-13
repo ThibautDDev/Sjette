@@ -1,4 +1,20 @@
-﻿<!DOCTYPE html>
+﻿@{
+    var ErrorMessage = TempData["Error"] as string;
+    var SuccesMessage = TempData["Succes"] as string;
+
+
+    if (string.IsNullOrEmpty(ErrorMessage))
+    {
+        ErrorMessage = "";
+    }
+    if (string.IsNullOrEmpty(SuccesMessage))
+    {
+        SuccesMessage = "";
+    }
+
+}
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -12,12 +28,13 @@
     <link rel="stylesheet" href="~/css/site.css" />
     <link rel="stylesheet" href="~/css/account.css" />
     <link rel="stylesheet" href="~/css/navbar.css" />
+    <link rel="stylesheet" href="~/css/scrollbar.css" />
     @await RenderSectionAsync("styles", required: false)
 
 
 </head>
-<body>
-    <header >
+<body class="scrollbar">
+    <header>
         <nav class="navbar navbar-expand-sm mb-3 py-3 active">
             <div class="container">
                 <a class="navbar-brand text-uppercase font-weight-bold" asp-controller="Home" asp-action="Index">Sjette</a>
@@ -51,6 +68,32 @@
         </main>
     </div>
 
+    <div class="modal fade" id="modalError">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="alert alert-block alert-danger">
+                        <h4>Error !</h4>
+                        <p id="errorText"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="modalSucces">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="alert alert-block alert-success">
+                        <h4>Succes !</h4>
+                        <p id="succesText"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <footer class="border-top footer text-muted text-center">
         <div class="container">
             &copy; 2021 - Sjette - Webdesign by TD
@@ -59,6 +102,23 @@
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script type="text/javascript">
+        $('document').ready(function () {
+            var succesMessage = "@SuccesMessage";
+            var errorMessage = "@ErrorMessage";
+
+            if (succesMessage != "") {
+                document.getElementById("succesText").innerHTML = succesMessage;
+                $("#modalSucces").modal()
+            } else if (errorMessage != "") {
+                document.getElementById("errorText").innerHTML = errorMessage;
+                $("#modalError").modal()
+            }
+            console.log("Succes", succesMessage)
+            console.log("Error", errorMessage)
+        });
+    </script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

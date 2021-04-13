@@ -6,7 +6,11 @@
     var routeUrl = Url.RouteUrl(ViewContext.RouteData.Values);
     var qsPath = ViewContext.HttpContext.Request.QueryString.Value;
     var url = $"{routeUrl}{qsPath}";
+
+    var dictForJsGroupDictionairy = Model.AllUsersOfGroupByGroupName;
+    var userId = Model.User.pk_UserID;
 }
+
 
 
 @section Styles{
@@ -21,22 +25,27 @@
             var firstGroup = Object.keys(LineChartData)[0]
             chartData = LineChartData[firstGroup]["Activities"]
         }
-        var amountOfGroups = @Html.Raw(Json.Serialize(Model.LineChartData.Keys.Count))
+        var amountOfGroups = @Html.Raw(Json.Serialize(Model.LineChartData.Keys.Count));
+        var groupDictionairy = @Html.Raw(Json.Serialize(dictForJsGroupDictionairy));
+        var userId = @Html.Raw(Json.Serialize(userId));
+        console.log(groupDictionairy)
+        console.log(userId)
     </script>
 
-    @*If there is an parameter, open the right tab*@
+    @*If there is an change of the active tab, change the innerhtmls of the modals*@
     <script type="text/javascript">
-            $('document').ready(function () {
-                const queryString = window.location.search;
-                console.log(queryString);
+        $('document').ready(function () {
+            const queryString = window.location.search;
+            console.log(queryString);
 
-                const urlParams = new URLSearchParams(queryString);
-                const groupId = urlParams.get('GroupId');
-                $(`#header_${groupId}`).click();
+            const urlParams = new URLSearchParams(queryString);
+            const groupId = urlParams.get('GroupId');
+            if (groupId == null) document.getElementsByClassName("headerOfTable")[0].click();
+            else $(`#header_${groupId}`).click();
+            console.log(groupId);
 
-                console.log(groupId);
 
-            });
+        });
     </script>
 
     <script src="~/lib/chart.js/Chart.min.js"></script>
@@ -44,7 +53,6 @@
     <script src="~/js/group.js"></script>
     <script src="~/js/sortTable.js"></script>
 }
-
 
 <div class="container-fluid">
     <div class="d-sm-flex align-items-center justify-content-between mb-4">
@@ -120,7 +128,6 @@
             </div>
         }
 
-
         @if (Model.MostMutualGroups.Count > 1)
         {
             int b = -1;
@@ -174,17 +181,18 @@
 
     <div class="row">
         <div class="vertical-tabs w-100">
-            <ul class="nav nav-tabs" role="tablist">
+            @*GRAFIEK HEIGHT IS 412PX*@
+            <ul class="nav nav-tabs scrollbar" role="tablist" style="overflow-y:auto; max-height:412px;">
                 @{int d = 0;}
                 @foreach (var group in Model.UserGroups)
                 {
                     <li class="nav-item">
-                        <a onclick="updateData(this, @d, '@group.GroupName', 'Activities')" class="nav-link @(group==Model.UserGroups.FirstOrDefault()?"active":"")" data-toggle="tab" href="#tab_@group.pk_GroupID" id="header_@group.pk_GroupID" role="tab">@group.GroupName</a>
+                        <a onclick="updateData(this, @d, '@group.GroupName', 'Activities')" class="headerOfTable nav-link @(group==Model.UserGroups.FirstOrDefault()?"active":"")" data-toggle="tab" href="#tab_@group.pk_GroupID" id="header_@group.pk_GroupID" role="tab">@group.GroupName</a>
                     </li>
                     d += 6;
                 }
-                <li class="nav-item">
-                    <a class="nav-link" asp-controller="Account" asp-action="CreateGroup"><b>Create a new group</b></a>
+                <li class="nav-item mb-0">
+                    <a class="nav-link" data-toggle="modal" data-target="#modalCreateGroup"><b>Create a new group</b></a>
                 </li>
             </ul>
             <div class="tab-content w-100">
@@ -192,233 +200,391 @@
                 @{int c = 0;}
                 @foreach (var group in Model.UserGroups)
                 {
-                <div class="tab-pane @(group==Model.UserGroups.FirstOrDefault()?"active":"")" id="tab_@group.pk_GroupID" role="tabpanel">
-                    <div class="row">
-                        <div class="col-xl-9 col-lg-12">
-                            <div class="card shadow mb-4">
-                                <div onclick="changeData(0, 1, @c, '@group.GroupName', 'Cycling')" style="cursor:pointer; user-select:none;" class="lineChartHeaders card-header py-3 d-flex flex-row align-items-center justify-content-between hoverHeader">
-                                    <h6 class="m-0 font-weight-bold text-primary">Total Activities (Monthly)</h6>
-                                </div>
-                                <div onclick="changeData(1, 2, @c, '@group.GroupName', 'Running')" style="cursor:pointer; user-select:none;" class="lineChartHeaders card-header py-3 flex-row align-items-center justify-content-between d-none hoverHeader">
-                                    <h6 class="m-0 font-weight-bold text-primary">Total Cycling Activities (Monthly)</h6>
-                                </div>
-                                <div onclick="changeData(2, 3, @c, '@group.GroupName', 'Hiking')" style="cursor:pointer; user-select:none;" class="lineChartHeaders card-header py-3 flex-row align-items-center justify-content-between d-none hoverHeader">
-                                    <h6 class="m-0 font-weight-bold text-primary">Total Running Activities (Monthly)</h6>
-                                </div>
-                                <div onclick="changeData(3, 4, @c, '@group.GroupName', 'Calories')" style="cursor:pointer; user-select:none;" class="lineChartHeaders card-header py-3 flex-row align-items-center justify-content-between d-none hoverHeader">
-                                    <h6 class="m-0 font-weight-bold text-primary">Total Hiking Activities (Monthly)</h6>
-                                </div>
-                                <div onclick="changeData(4, 5, @c, '@group.GroupName', 'Distance')" style="cursor:pointer; user-select:none;" class="lineChartHeaders card-header py-3 flex-row align-items-center justify-content-between d-none hoverHeader">
-                                    <h6 class="m-0 font-weight-bold text-primary">Total Calories (Monthly)</h6>
-                                </div>
-                                <div onclick="changeData(5, 0, @c, '@group.GroupName', 'Activities')" style="cursor:pointer; user-select:none;" class="lineChartHeaders card-header py-3 flex-row align-items-center justify-content-between d-none hoverHeader">
-                                    <h6 class="m-0 font-weight-bold text-primary">Total Distance (Monthly)</h6>
-                                </div>
-
-                                <div class="card-body">
-                                    <div class="chart-area">
-                                        <canvas class="lineCharts"></canvas>
+                    <div class="tab-pane @(group==Model.UserGroups.FirstOrDefault()?"active":"")" id="tab_@group.pk_GroupID" role="tabpanel">
+                        <div class="row">
+                            <div class="col-xl-9 col-lg-12">
+                                <div class="card shadow mb-4">
+                                    <div onclick="changeData(0, 1, @c, '@group.GroupName', 'Cycling')" style="cursor:pointer; user-select:none;" class="lineChartHeaders card-header py-3 d-flex flex-row align-items-center justify-content-between hoverHeader">
+                                        <h6 class="m-0 font-weight-bold text-primary">Total Activities (Monthly)</h6>
                                     </div>
+                                    <div onclick="changeData(1, 2, @c, '@group.GroupName', 'Running')" style="cursor:pointer; user-select:none;" class="lineChartHeaders card-header py-3 flex-row align-items-center justify-content-between d-none hoverHeader">
+                                        <h6 class="m-0 font-weight-bold text-primary">Total Cycling Activities (Monthly)</h6>
+                                    </div>
+                                    <div onclick="changeData(2, 3, @c, '@group.GroupName', 'Hiking')" style="cursor:pointer; user-select:none;" class="lineChartHeaders card-header py-3 flex-row align-items-center justify-content-between d-none hoverHeader">
+                                        <h6 class="m-0 font-weight-bold text-primary">Total Running Activities (Monthly)</h6>
+                                    </div>
+                                    <div onclick="changeData(3, 4, @c, '@group.GroupName', 'Calories')" style="cursor:pointer; user-select:none;" class="lineChartHeaders card-header py-3 flex-row align-items-center justify-content-between d-none hoverHeader">
+                                        <h6 class="m-0 font-weight-bold text-primary">Total Hiking Activities (Monthly)</h6>
+                                    </div>
+                                    <div onclick="changeData(4, 5, @c, '@group.GroupName', 'Distance')" style="cursor:pointer; user-select:none;" class="lineChartHeaders card-header py-3 flex-row align-items-center justify-content-between d-none hoverHeader">
+                                        <h6 class="m-0 font-weight-bold text-primary">Total Calories (Monthly)</h6>
+                                    </div>
+                                    <div onclick="changeData(5, 0, @c, '@group.GroupName', 'Activities')" style="cursor:pointer; user-select:none;" class="lineChartHeaders card-header py-3 flex-row align-items-center justify-content-between d-none hoverHeader">
+                                        <h6 class="m-0 font-weight-bold text-primary">Total Distance (Monthly)</h6>
+                                    </div>
+
+                                    <div class="card-body">
+                                        <div class="chart-area">
+                                            <canvas class="lineCharts"></canvas>
+                                        </div>
+                                    </div>
+                                    @{c += 6;}
                                 </div>
-                                @{c += 6;}
                             </div>
-                        </div>
 
+                            <div class="col-auto mb-4">
+                                <div class="card shadow mb-4">
+                                    <div class="card-header py-3">
+                                        <h6 class="m-0 font-weight-bold text-primary">Group - Quick Menu</h6>
+                                    </div>
 
-
-
-                        <div class="col-auto mb-4">
-                            <div class="card shadow mb-4">
-                                <div class="card-header py-3">
-                                    <h6 class="m-0 font-weight-bold text-primary">Group - Quick Menu</h6>
-                                </div>
-
-                                <div class="card-body">
-                                    <ul class="m-0 pl-3">
-                                        <li>
-                                            <a class="hover" asp-controller="Account" asp-action="CreateGroup">
-                                                <p class="h6 hover text-secondary font-weight-bold">Add A Friend</p>
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <a class="hover" asp-controller="Account" asp-action="LeaveGroup">
-                                                <p class="h6 hover text-secondary font-weight-bold">Leave Group</p>
-                                            </a>
-                                        </li>
-
-
-                                        @*Admin section*@
-                                        @if (Model.User.pk_UserID == group.fk_CreatorID)
-                                        {
-                                            <hr />
+                                    <div class="card-body">
+                                        <ul class="m-0 pl-3">
                                             <li>
-                                                <a class="hover" asp-controller="Account" asp-action="Group">
-                                                    <p class="h6 hover text-danger font-weight-bold">Admin Transfer</p>
+                                                <a class="hover" data-toggle="modal" data-target="#modalAddMemberToGroup">
+                                                    <p class="h6 hover text-secondary font-weight-bold">Add A Member</p>
                                                 </a>
                                             </li>
-                                            <li>
-                                                <a class="hover" asp-controller="Account" asp-action="Group">
-                                                    <p class="h6 hover text-danger font-weight-bold">Remove Member</p>
-                                                </a>
-                                            </li>
-
-                                            @if (Model.AllUsersOfGroup[group.pk_GroupID].Count == 1)
+                                            @if (Model.User.pk_UserID != group.fk_CreatorID)
                                             {
                                                 <li>
-                                                    <a class="hover" asp-controller="Account" asp-action="Group">
-                                                        <p class="h6 hover text-danger font-weight-bold">Delete Group</p>
+                                                    <a class="hover" data-toggle="modal" data-target="#modalLeaveGroup">
+                                                        <p class="h6 hover text-secondary font-weight-bold">Leave Group</p>
                                                     </a>
                                                 </li>
                                             }
-                                        }
-                                    </ul>
+
+                                            @*Admin section*@
+                                            @if (Model.User.pk_UserID == group.fk_CreatorID)
+                                            {
+                                                <hr />
+                                                @if (Model.AllUsersOfGroup[group.pk_GroupID].Count > 1)
+                                                {
+                                                    <li>
+                                                        <a class="hover" data-toggle="modal" data-target="#modalTransferAdmin">
+                                                            <p class="h6 hover text-danger font-weight-bold">Admin Transfer</p>
+                                                        </a>
+                                                    </li>
+                                                    <li>
+                                                        <a class="hover" data-toggle="modal" data-target="#modalRemoveMember">
+                                                            <p class="h6 hover text-danger font-weight-bold">Remove Member</p>
+                                                        </a>
+                                                    </li>
+                                                }
+
+                                                @if (Model.AllUsersOfGroup[group.pk_GroupID].Count == 1)
+                                                {
+                                                    <li>
+                                                        <a class="hover" data-toggle="modal" data-target="#modalDeleteGroup">
+                                                            <p class="h6 hover text-danger font-weight-bold">Delete Group</p>
+                                                        </a>
+                                                    </li>
+                                                }
+                                            }
+                                        </ul>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
 
-                    @*TABEL*@
-                    <div class="row">
-                        <div class="col-lg-12 mb-4">
-                            <div class="card shadow mb-4">
-                                <div class="card-header py-3 d-flex justify-content-between">
-                                    <h6 class="m-0 font-weight-bold text-primary py-0 my-auto">
-                                        Ranking Of Members - @group.GroupName
-                                    </h6>
-                                    <ul class="nav nav-pills m-0 p-0 py-1" role="tablist">
-                                        <li class="nav-item">
-                                            <a class="nav-link active" data-toggle="tab" href="#table1_@group.pk_GroupID" role="tab">Cycling</a>
-                                        </li>
-                                        <li class="nav-item">
-                                            <a class="nav-link" data-toggle="tab" href="#table2_@group.pk_GroupID" role="tab">Running</a>
-                                        </li>
-                                        <li class="nav-item">
-                                            <a class="nav-link" data-toggle="tab" href="#table3_@group.pk_GroupID" role="tab">Hiking</a>
-                                        </li>
-
-                                    </ul>
-
-                                </div>
-                                <div class="card-body">
-                                    <div class="tab-content" id="myTabContent">
-                                        <div class="tab-pane fade show active" id="table1_@group.pk_GroupID" role="tabpanel">
-                                            <table class="table table-hover table-sm mb-0" id="table1_@group.GroupName">
-                                                <thead>
-                                                    <tr>
-                                                        @{ int e = 0;}
-                                                        @foreach (var header in Model.TableHeaders["Cycling"])
-                                                        {
-                                                            <th style="cursor:pointer; user-select:none;" onclick="sortTable(@e, 'table1_@group.GroupName')" scope="col">@header</th>
-                                                            e++;
-                                                        }
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    @foreach (var dict in Model.TableData[group.pk_GroupID]["Cycling"])
-                                                    {
+                        @*TABEL*@
+                        <div class="row">
+                            <div class="col-lg-12 mb-4">
+                                <div class="card shadow mb-4">
+                                    <div class="card-header py-3 d-flex justify-content-between">
+                                        <h6 class="m-0 font-weight-bold text-primary py-0 my-auto">
+                                            Ranking Of Members - @group.GroupName
+                                        </h6>
+                                        <ul class="nav nav-pills m-0 p-0 py-1" role="tablist">
+                                            <li class="nav-item">
+                                                <a class="nav-link active" data-toggle="tab" href="#table1_@group.pk_GroupID" role="tab">Cycling</a>
+                                            </li>
+                                            <li class="nav-item">
+                                                <a class="nav-link" data-toggle="tab" href="#table2_@group.pk_GroupID" role="tab">Running</a>
+                                            </li>
+                                            <li class="nav-item">
+                                                <a class="nav-link" data-toggle="tab" href="#table3_@group.pk_GroupID" role="tab">Hiking</a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="tab-content" id="myTabContent">
+                                            <div class="tab-pane fade show active" id="table1_@group.pk_GroupID" role="tabpanel">
+                                                <table class="table table-hover table-sm mb-0" id="table1_@group.GroupName">
+                                                    <thead>
                                                         <tr>
-                                                            <td scope="row">@dict.Key</td>
-                                                            @{ int f = 0;}
-                                                            @foreach (var item in dict.Value)
+                                                            @{ int e = 0;}
+                                                            @foreach (var header in Model.TableHeaders["Cycling"])
                                                             {
-                                                                @if (f == 1 || f == 4 || f == 5)
-                                                                {
-                                                                    <td>@TimeSpan.FromMinutes(item)</td>
-                                                                }
-                                                                else
-                                                                {
-                                                                    <td>@item</td>
-                                                                }
-                                                                f++;
+                                                                <th style="cursor:pointer; user-select:none;" onclick="sortTable(@e, 'table1_@group.GroupName')" scope="col">@header</th>
+                                                                e++;
                                                             }
                                                         </tr>
-                                                    }
-                                                </tbody>
-                                            </table>
-                                        </div>
+                                                    </thead>
+                                                    <tbody>
+                                                        @foreach (var dict in Model.TableData[group.pk_GroupID]["Cycling"])
+                                                        {
+                                                            <tr>
+                                                                <td scope="row">@dict.Key</td>
+                                                                @{ int f = 0;}
+                                                                @foreach (var item in dict.Value)
+                                                                {
+                                                                    @if (f == 1 || f == 4 || f == 5)
+                                                                    {
+                                                                        <td>@TimeSpan.FromMinutes(item)</td>
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <td>@item</td>
+                                                                    }
+                                                                    f++;
+                                                                }
+                                                            </tr>
+                                                        }
+                                                    </tbody>
+                                                </table>
+                                            </div>
 
-                                        <div class="tab-pane fade" id="table2_@group.pk_GroupID" role="tabpanel">
-                                            <table class="table table-hover table-sm mb-0" id="table2_@group.GroupName">
-                                                <thead>
-                                                    <tr>
-                                                        @{ e = 0;}
-                                                        @foreach (var header in Model.TableHeaders["Running"])
-                                                        {
-                                                            <th style="cursor:pointer; user-select:none;" onclick="sortTable(@e, 'table2_@group.GroupName')" scope="col">@header</th>
-                                                            e++;
-                                                        }
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    @foreach (var dict in Model.TableData[group.pk_GroupID]["Running"])
-                                                    {
+                                            <div class="tab-pane fade" id="table2_@group.pk_GroupID" role="tabpanel">
+                                                <table class="table table-hover table-sm mb-0" id="table2_@group.GroupName">
+                                                    <thead>
                                                         <tr>
-                                                            <td scope="row">@dict.Key</td>
-                                                            @{ int f = 0;}
-                                                            @foreach (var item in dict.Value)
+                                                            @{ e = 0;}
+                                                            @foreach (var header in Model.TableHeaders["Running"])
                                                             {
-                                                                @if (f == 1 || f == 4 || f == 5 || f == 6 || f == 7)
-                                                                {
-                                                                    <td>@TimeSpan.FromMinutes(item)</td>
-                                                                }
-                                                                else
-                                                                {
-                                                                    <td>@item</td>
-                                                                }
-                                                                f++;
+                                                                <th style="cursor:pointer; user-select:none;" onclick="sortTable(@e, 'table2_@group.GroupName')" scope="col">@header</th>
+                                                                e++;
                                                             }
                                                         </tr>
-                                                    }
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                        <div class="tab-pane fade" id="table3_@group.pk_GroupID" role="tabpanel">
-                                            <table class="table table-hover table-sm mb-0" id="table3_@group.GroupName">
-                                                <thead>
-                                                    <tr>
-                                                        @{ e = 0;}
-                                                        @foreach (var header in Model.TableHeaders["Hiking"])
+                                                    </thead>
+                                                    <tbody>
+                                                        @foreach (var dict in Model.TableData[group.pk_GroupID]["Running"])
                                                         {
-                                                            <th style="cursor:pointer; user-select:none;" onclick="sortTable(@e, 'table3_@group.GroupName')" scope="col">@header</th>
-                                                            e++;
+                                                            <tr>
+                                                                <td scope="row">@dict.Key</td>
+                                                                @{ int f = 0;}
+                                                                @foreach (var item in dict.Value)
+                                                                {
+                                                                    @if (f == 1 || f == 4 || f == 5 || f == 6 || f == 7)
+                                                                    {
+                                                                        <td>@TimeSpan.FromMinutes(item)</td>
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <td>@item</td>
+                                                                    }
+                                                                    f++;
+                                                                }
+                                                            </tr>
                                                         }
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    @foreach (var dict in Model.TableData[group.pk_GroupID]["Hiking"])
-                                                    {
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                            <div class="tab-pane fade" id="table3_@group.pk_GroupID" role="tabpanel">
+                                                <table class="table table-hover table-sm mb-0" id="table3_@group.GroupName">
+                                                    <thead>
                                                         <tr>
-                                                            <td scope="row">@dict.Key</td>
-                                                            @{ int f = 0;}
-                                                            @foreach (var item in dict.Value)
+                                                            @{ e = 0;}
+                                                            @foreach (var header in Model.TableHeaders["Hiking"])
                                                             {
-                                                                @if (f == 1)
-                                                                {
-                                                                    <td>@TimeSpan.FromMinutes(item)</td>
-                                                                }
-                                                                else
-                                                                {
-                                                                    <td>@item</td>
-                                                                }
-                                                                f++;
+                                                                <th style="cursor:pointer; user-select:none;" onclick="sortTable(@e, 'table3_@group.GroupName')" scope="col">@header</th>
+                                                                e++;
                                                             }
                                                         </tr>
-                                                    }
-                                                </tbody>
-                                            </table>
+                                                    </thead>
+                                                    <tbody>
+                                                        @foreach (var dict in Model.TableData[group.pk_GroupID]["Hiking"])
+                                                        {
+                                                            <tr>
+                                                                <td scope="row">@dict.Key</td>
+                                                                @{ int f = 0;}
+                                                                @foreach (var item in dict.Value)
+                                                                {
+                                                                    @if (f == 1)
+                                                                    {
+                                                                        <td>@TimeSpan.FromMinutes(item)</td>
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <td>@item</td>
+                                                                    }
+                                                                    f++;
+                                                                }
+                                                            </tr>
+                                                        }
+                                                    </tbody>
+                                                </table>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-
-
-
-
-                </div>
                 }
             </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modals -->
+<div class="modal fade" id="modalCreateGroup" tabindex="-1" role="dialog" aria-labelledby="modalCreateGroupLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <form method="post" asp-controller="Account" asp-action="createNewGroup">
+                <input type="hidden" name="redirectUrl" value="@url">   @*HIDDEN INPUT FOR REDIRECTINGPAGE*@
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalCreateGroupLabel">Create A Group</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Groupname</label>
+                        <input type="text" class="form-control" required="required" name="name" />
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-success">Create Group</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modalLeaveGroup" tabindex="-1" role="dialog" aria-labelledby="modalLeaveGroupLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <form method="post" asp-controller="Account" asp-action="leaveGroup">
+                <input type="hidden" name="redirectUrl" value="@url">   @*HIDDEN INPUT FOR REDIRECTINGPAGE*@
+                <input type="hidden" name="groupName" id="leaveGroupName" value="">   @*HIDDEN INPUT FOR GROUPNAME *EDITS DYNAMIC VIA JS**@
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalLeaveGroupLabel">Leave A Group</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <h5 class="modal-title" id="leaveGroupText">Leave A Group</h5>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-danger">Leave</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modalDeleteGroup" tabindex="-1" role="dialog" aria-labelledby="modalDeleteGroupLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <form method="post" asp-controller="Account" asp-action="deleteGroup">
+                <input type="hidden" name="redirectUrl" value="@url">   @*HIDDEN INPUT FOR REDIRECTINGPAGE*@
+                <input type="hidden" name="groupName" id="deleteGroupName" value="">   @*HIDDEN INPUT FOR GROUPNAME *EDITS DYNAMIC VIA JS**@
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalDeleteGroupLabel">Delete A Group</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <h5 class="modal-title" id="deleteGroupText">Delete A Group</h5>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modalAddMemberToGroup" tabindex="-1" role="dialog" aria-labelledby="modalAddMemberToGroupLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <form method="post" asp-controller="Account" asp-action="addMember">
+                <input type="hidden" name="redirectUrl" value="@url">   @*HIDDEN INPUT FOR REDIRECTINGPAGE*@
+                <input type="hidden" name="groupName" id="addMemberGroupName" value="">   @*HIDDEN INPUT FOR GROUPNAME *EDITS DYNAMIC VIA JS**@
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalAddMemberToGroupLabel">Add A Member</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <div class="form-group">
+                            <label>Email Of The User</label>
+                            <input type="email" class="form-control" required="required" name="email" />
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-success">Add</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modalRemoveMember" tabindex="-1" role="dialog" aria-labelledby="modalRemoveMemberLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <form method="post" asp-controller="Account" asp-action="removeMember">
+                <input type="hidden" name="redirectUrl" value="@url">   @*HIDDEN INPUT FOR REDIRECTINGPAGE*@
+                <input type="hidden" name="groupName" id="removeMemberGroupName" value="">   @*HIDDEN INPUT FOR GROUPNAME *EDITS DYNAMIC VIA JS**@
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalRemoveMemberLabel">Remove A Member</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Choose A User</label>
+                        <select name="userToRemove" id="UserToRemove" required></select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-danger">Remove</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modalTransferAdmin" tabindex="-1" role="dialog" aria-labelledby="modalTransferAdminLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <form method="post" asp-controller="Account" asp-action="transferAdmin">
+                <input type="hidden" name="redirectUrl" value="@url">   @*HIDDEN INPUT FOR REDIRECTINGPAGE*@
+                <input type="hidden" name="groupName" id="transferAdminGroupName" value="">   @*HIDDEN INPUT FOR GROUPNAME *EDITS DYNAMIC VIA JS**@
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalTransferAdminLabel">Transfer Admin-Rights</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Choose A User</label>
+                        <select name="userToTransfer" id="UserToTransfer" required></select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-danger">Transfer</button>
+                </div>
+            </form>
         </div>
     </div>
 </div>

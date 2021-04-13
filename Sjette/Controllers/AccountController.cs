@@ -63,12 +63,39 @@ namespace Sjette.Controllers
 
         
         /*
+         * Function that returns an userObject of the SQL DB with a given context and email.
+         * This functions is private because of the internal use inside this controller.
+        */
+        private static async Task<Users> getUserByEmailAsync(SjetteContext ctx, string email)
+        {
+            var x = await ctx.Users.FromSqlRaw($"SELECT U.* " +
+                                              $"FROM Users AS U " +
+                                              $"WHERE U.Email = '{email}'").ToListAsync();
+            if (x.Count == 0) return null;
+            return x.First();
+        }
+
+
+        /*
          * Function that returns an userObject of the SQL DB with a given context and id.
          * This functions is private because of the internal use inside this controller.
         */
         private static async Task<Users> getUserByIdAsync(SjetteContext ctx, int id)
         {
             return await ctx.Users.FindAsync(id);
+        }
+
+
+        /*
+         * Function that returns an userObject of the SQL DB with a given context and id.
+         * This functions is private because of the internal use inside this controller.
+        */
+        private static async Task<Groups> getGroupByNameAsync(SjetteContext ctx, string groupName)
+        {
+            var x = await ctx.Groups.FromSqlRaw($"SELECT G.* " +
+                                               $"FROM Groups AS G " +
+                                               $"WHERE G.GroupName = '{groupName}'").ToListAsync();
+            return x.First();
         }
 
 
@@ -144,6 +171,16 @@ namespace Sjette.Controllers
             }
             return ReturnDict;
         }
+        private static async Task<List<Users>> getAllUsersOfGroupAsync(SjetteContext ctx, Groups group)
+        {
+            var x = await ctx.Users.FromSqlRaw($"SELECT U.* " +
+                                                    $"FROM Users AS U " +
+                                                    $"WHERE U.pk_UserID IN " +
+                                                        $"(SELECT G.UserID " +
+                                                        $" FROM GroupMembership AS G " +
+                                                        $" WHERE G.GroupID = {group.pk_GroupID})").ToListAsync();
+            return x;
+        }
 
 
         /* 
@@ -153,11 +190,25 @@ namespace Sjette.Controllers
         private static async Task<List<Users>> getMutualUsers(SjetteContext ctx)
         {
             var x = await ctx.Users.FromSqlRaw($"SELECT U.* " + 
-                                               $"FROM Users as U " +
+                                               $"FROM Users AS U " +
                                                $"INNER JOIN GroupMembership AS GM " +
                                                $"ON U.pk_UserID = GM.UserID").ToListAsync();
             return x;
         }
+
+
+        /* 
+         * Function that returns a list of mutual users with a given context and list of groupObjects. 
+         * This functions is private because of the internal use inside this controller.
+        */
+        private static async Task<List<GroupMembership>> GetGroupMembershipsOfUserAsync(SjetteContext ctx, int userId)
+        {
+            var x = await ctx.GroupMembership.FromSqlRaw($"SELECT GM.* " +
+                                                         $"FROM GroupMembership AS GM " +
+                                                         $"WHERE GM.UserID={userId}").ToListAsync();
+            return x;
+        }
+
 
 
         // GET: Account/
@@ -194,6 +245,7 @@ namespace Sjette.Controllers
         [HttpPost("createActivity")]
         public async Task<IActionResult> createNewActivity(string activityType, string activityName, decimal totalKms, DateTime startTime, TimeSpan totalTime, string gear, int calories)
         {
+            bool done = false;
             setUserDictionairy();
 
             Activities Activity = new Activities();
@@ -212,19 +264,6 @@ namespace Sjette.Controllers
             return Redirect("~/Account");
         }
 
-
-        // GET: Account/EditActivity
-        public IActionResult EditActivity()
-        {
-            return View();
-        }
-
-
-        // GET: Account/DeleteActivity
-        public IActionResult DeleteActivity()
-        {
-            return View();
-        }
 
 
         // GET: Account/Group
@@ -245,24 +284,189 @@ namespace Sjette.Controllers
         }
 
 
-        // GET: Account/CreateGroup
-        public IActionResult CreateGroup()
+        // POST: createGroup
+        [HttpPost("createGroup")]
+        public async Task<IActionResult> createNewGroup(string redirectUrl, string name)
         {
-            return View();
+            setUserDictionairy();
+            int userId = Convert.ToInt32(UserDictionairy["UserID"]);
+
+            Groups Group = new Groups();
+            Group.fk_CreatorID = userId;
+            Group.GroupName = name;
+            _context.Add(Group);
+            await _context.SaveChangesAsync();  // Or I don't have a primary key for the membership
+
+            GroupMembership GroupMembership = new GroupMembership();
+            GroupMembership.GroupID = Group.pk_GroupID;
+            GroupMembership.UserID = userId;
+            _context.Add(GroupMembership);
+            await _context.SaveChangesAsync();
+
+            TempData["Succes"] = "Group was succesfully created";
+            var url = $"~{redirectUrl}";
+            return Redirect(url);
         }
 
 
-        // GET: Account/LeaveGroup
-        public IActionResult LeaveGroup()
+        // POST: leaveGroup
+        [HttpPost("leaveGroup")]
+        public async Task<IActionResult> leaveGroup(string redirectUrl, string groupName)
         {
-            return View();
+            bool done = false;
+            setUserDictionairy();
+            int userId = Convert.ToInt32(UserDictionairy["UserID"]);
+            var group = await getGroupByNameAsync(_context, groupName);
+
+            var MembershipList = await GetGroupMembershipsOfUserAsync(_context, userId);
+            foreach (var item in MembershipList)
+            {
+                if (item.GroupID == group.pk_GroupID)
+                {
+                    _context.GroupMembership.Remove(item);
+                    await _context.SaveChangesAsync();
+                    done = true;
+                }
+            }
+
+            if (done) TempData["Succes"] = "You succesfully left the group";
+            else TempData["Error"] = "Something went wrong while leaving this group. Please contact an administrator";
+
+            var url = $"~{redirectUrl}";
+            return Redirect(url);
         }
 
 
-        // GET: Account/DeleteGroup
-        public IActionResult DeleteGroup()
+        // POST: deleteGroup
+        [HttpPost("deleteGroup")]
+        public async Task<IActionResult> deleteGroup(string redirectUrl, string groupName)
         {
-            return View();
+            bool done = false;
+            setUserDictionairy();
+            int userId = Convert.ToInt32(UserDictionairy["UserID"]);
+            var group = await getGroupByNameAsync(_context, groupName);
+            var members = await getAllUsersOfGroupAsync(_context, group);
+
+            //ExtraSecurityCheck - Request is from creator and group has only 1 member
+            if (group.fk_CreatorID == userId && members.Count == 1)
+            {
+                var MembershipList = await GetGroupMembershipsOfUserAsync(_context, userId);
+                var membership = MembershipList.Find(x => x.GroupID == group.pk_GroupID);
+
+                if (membership != null)
+                {
+                    _context.GroupMembership.Remove(membership);
+                    _context.Groups.Remove(group);
+                    await _context.SaveChangesAsync();
+                    done = true;
+                } TempData["Error"] = "Something went wrong with deleting this group. Contact an admin.";
+            } else return Redirect("~/Error/403");
+
+            if (done) TempData["Succes"] = "Group was succesfully deleted";
+            var url = $"~{redirectUrl}";
+            return Redirect(url);
+        }
+
+
+        // POST: addMember
+        [HttpPost("addMember")]
+        public async Task<IActionResult> addMember(string redirectUrl, string groupName, string email)
+        {
+            bool done = false;
+            var group = await getGroupByNameAsync(_context, groupName);
+
+            var newMember = await getUserByEmailAsync(_context, email);
+            if (newMember != null)
+            {
+                var GroupMembershipsOfNewMember = await GetGroupMembershipsOfUserAsync(_context, newMember.pk_UserID);
+                var isAlreadyMember = false;
+                foreach (var item in GroupMembershipsOfNewMember) if (item.GroupID == group.pk_GroupID) isAlreadyMember = true;
+
+                if (!isAlreadyMember)
+                {
+                    GroupMembership membership = new GroupMembership();
+                    membership.GroupID = group.pk_GroupID;
+                    membership.UserID = newMember.pk_UserID;
+
+                    _context.GroupMembership.Add(membership);
+                    await _context.SaveChangesAsync();
+                    done = true;
+                }
+                else TempData["Error"] = "This email is linked to an user that already is a member of this group. Try again with a valid email";
+            } else TempData["Error"] = "Email is not linked to a valid user. Try again with a valid email";
+
+            if (done) TempData["Succes"] = "Member succesfully added to the group";
+            var url = $"~{redirectUrl}";
+            return Redirect(url);
+        }
+
+
+        // POST: removeMember
+        [HttpPost("removeMember")]
+        public async Task<IActionResult> removeMember(string redirectUrl, string groupName, int userToRemove)
+        {
+            bool done = false;
+            setUserDictionairy();
+            int userId = Convert.ToInt32(UserDictionairy["UserID"]);
+            var group = await getGroupByNameAsync(_context, groupName);
+
+            if (group.fk_CreatorID == userId)
+            {
+                var member = await getUserByIdAsync(_context, userToRemove);
+                if (member != null)
+                {
+                    var MembershipList = await GetGroupMembershipsOfUserAsync(_context, member.pk_UserID);
+                    var membership = MembershipList.Find(x => x.GroupID == group.pk_GroupID);
+                    if (membership != null)
+                    {
+                        _context.GroupMembership.Remove(membership);
+                        await _context.SaveChangesAsync();
+                        done = true;
+                    }
+                    else TempData["Error"] = "This user is not a member of this group. Please select a valid member";
+                }
+                else TempData["Error"] = "This person is not a valid user of this application. Please select a valid member";
+            }
+            else redirectUrl = "/Error/403";
+
+            if (done) TempData["Succes"] = "Member succesfully removed to the group";
+            var url = $"~{redirectUrl}";
+            return Redirect(url);
+        }
+
+        //TRANSFER ADMIN NOG DOEN
+        // POST: removeMember
+        [HttpPost("transferAdmin")]
+        public async Task<IActionResult> transferAdmin(string redirectUrl, string groupName, int userToTransfer)
+        {
+            bool done = false;
+            setUserDictionairy();
+            int userId = Convert.ToInt32(UserDictionairy["UserID"]);
+            var group = await getGroupByNameAsync(_context, groupName);
+
+            if (group.fk_CreatorID == userId)
+            {
+                var member = await getUserByIdAsync(_context, userToTransfer);
+                if (member != null)
+                {
+                    var MembershipList = await GetGroupMembershipsOfUserAsync(_context, member.pk_UserID);
+                    var membership = MembershipList.Find(x => x.GroupID == group.pk_GroupID);
+                    if (membership != null)
+                    {
+                        group.fk_CreatorID = member.pk_UserID;
+                        _context.Groups.Update(group);
+                        await _context.SaveChangesAsync();
+                        done = true;
+                    }
+                    else TempData["Error"] = "This user is not a member of this group. Please select a valid member";
+                }
+                else TempData["Error"] = "This person is not a valid user of this application. Please select a valid member";
+            }
+            else redirectUrl = "/Error/403";
+
+            if (done) TempData["Succes"] = "Admin-rights were succesfully transfered";
+            var url = $"~{redirectUrl}";
+            return Redirect(url);
         }
 
 
@@ -290,6 +494,7 @@ namespace Sjette.Controllers
                 user.Email = email;
                 user.PasswordHash = hashPassword(user.Hash, newPassword);
                 await _context.SaveChangesAsync();
+                TempData["Succes"] = "Settings were succesfully saved";
                 return Redirect("/Account");
             } else if (newPassword != newPasswordConfirm)
             {
