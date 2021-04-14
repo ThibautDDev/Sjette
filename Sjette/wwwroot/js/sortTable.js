@@ -1,5 +1,12 @@
-﻿function isNumeric(value) {
-    return /^-?\d+$/.test(value);
+﻿function isNumeric(str) {
+    if (typeof str != "string") return false // we only process strings!  
+    return !isNaN(str) && // use type coercion to parse the _entirety_ of the string (`parseFloat` alone does not do this)...
+        !isNaN(parseFloat(str)) // ...and ensure strings of whitespace fail
+}
+
+
+function isDate(str) {
+    return str.includes("/") && str.includes(":")
 }
 
 function sortTable(n, objectName) {
@@ -33,6 +40,18 @@ function sortTable(n, objectName) {
                         break;
                     }
 
+                } else if (isDate(x.innerHTML) || isDate(y.innerHTML)) {
+                    var a = x.innerHTML.split(" ")
+                    var b = y.innerHTML.split(" ")
+
+                    var date1 = new Date(a[0].split("/")[2], a[0].split("/")[1], a[0].split("/")[0], a[1].split(":")[0], a[1].split(":")[1])
+                    var date2 = new Date(b[0].split("/")[2], b[0].split("/")[1], b[0].split("/")[0], b[1].split(":")[0], b[1].split(":")[1])
+                    if (date1 > date2) {
+                        // If so, mark as a switch and break the loop:
+                        shouldSwitch = true;
+                        break;
+                    }
+
                 } else if (x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()) {
                     // If so, mark as a switch and break the loop:
                     shouldSwitch = true;
@@ -46,7 +65,19 @@ function sortTable(n, objectName) {
                         break;
                     }
 
-                } else if (x.innerHTML.toLowerCase() < y.innerHTML.toLowerCase()) {
+                } else if (isDate(x.innerHTML) || isDate(y.innerHTML)) {
+                    var a = x.innerHTML.split(" ")
+                    var b = y.innerHTML.split(" ")
+
+                    var date1 = new Date(a[0].split("/")[2], a[0].split("/")[1], a[0].split("/")[0], a[1].split(":")[0], a[1].split(":")[1])
+                    var date2 = new Date(b[0].split("/")[2], b[0].split("/")[1], b[0].split("/")[0], b[1].split(":")[0], b[1].split(":")[1])
+                    if (date1 < date2) {
+                        // If so, mark as a switch and break the loop:
+                        shouldSwitch = true;
+                        break;
+                    }
+
+                }  else if (x.innerHTML.toLowerCase() < y.innerHTML.toLowerCase()) {
                     // If so, mark as a switch and break the loop:
                     shouldSwitch = true;
                     break;

@@ -69,8 +69,8 @@ namespace Sjette.Controllers
         private static async Task<Users> getUserByEmailAsync(SjetteContext ctx, string email)
         {
             var x = await ctx.Users.FromSqlRaw($"SELECT U.* " +
-                                              $"FROM Users AS U " +
-                                              $"WHERE U.Email = '{email}'").ToListAsync();
+                                               $"FROM Users AS U " +
+                                               $"WHERE U.Email = '{email}'").ToListAsync();
             if (x.Count == 0) return null;
             return x.First();
         }
@@ -90,11 +90,21 @@ namespace Sjette.Controllers
          * Function that returns an userObject of the SQL DB with a given context and id.
          * This functions is private because of the internal use inside this controller.
         */
+        private static async Task<Activities> getActivityByIdAsync(SjetteContext ctx, int id)
+        {
+            return await ctx.Activities.FindAsync(id);
+        }
+
+
+        /*
+         * Function that returns an userObject of the SQL DB with a given context and id.
+         * This functions is private because of the internal use inside this controller.
+        */
         private static async Task<Groups> getGroupByNameAsync(SjetteContext ctx, string groupName)
         {
             var x = await ctx.Groups.FromSqlRaw($"SELECT G.* " +
-                                               $"FROM Groups AS G " +
-                                               $"WHERE G.GroupName = '{groupName}'").ToListAsync();
+                                                $"FROM Groups AS G " +
+                                                $"WHERE G.GroupName = '{groupName}'").ToListAsync();
             return x.First();
         }
 
@@ -162,11 +172,11 @@ namespace Sjette.Controllers
             foreach (Groups group in groupsOfUser)
             {
                 var x = await ctx.Users.FromSqlRaw($"SELECT U.* " +
-                                                        $"FROM Users AS U " +
-                                                        $"WHERE U.pk_UserID IN " +
-                                                            $"(SELECT G.UserID " +
-                                                            $" FROM GroupMembership AS G " +
-                                                            $" WHERE G.GroupID = {group.pk_GroupID})").ToListAsync();
+                                                   $"FROM Users AS U " +
+                                                   $"WHERE U.pk_UserID IN " +
+                                                       $"(SELECT G.UserID " +
+                                                       $" FROM GroupMembership AS G " +
+                                                       $" WHERE G.GroupID = {group.pk_GroupID})").ToListAsync();
                 ReturnDict[group.pk_GroupID] = x;
             }
             return ReturnDict;
@@ -174,11 +184,11 @@ namespace Sjette.Controllers
         private static async Task<List<Users>> getAllUsersOfGroupAsync(SjetteContext ctx, Groups group)
         {
             var x = await ctx.Users.FromSqlRaw($"SELECT U.* " +
-                                                    $"FROM Users AS U " +
-                                                    $"WHERE U.pk_UserID IN " +
-                                                        $"(SELECT G.UserID " +
-                                                        $" FROM GroupMembership AS G " +
-                                                        $" WHERE G.GroupID = {group.pk_GroupID})").ToListAsync();
+                                               $"FROM Users AS U " +
+                                               $"WHERE U.pk_UserID IN " +
+                                                   $"(SELECT G.UserID " +
+                                                   $" FROM GroupMembership AS G " +
+                                                   $" WHERE G.GroupID = {group.pk_GroupID})").ToListAsync();
             return x;
         }
 
@@ -229,9 +239,16 @@ namespace Sjette.Controllers
 
 
         // GET: Account/Activity/
-        public IActionResult Activity()
+        public async Task<IActionResult> Activity()
         {
-            return View();
+            setUserDictionairy();
+            var id = Convert.ToInt32(UserDictionairy["UserID"]);
+            var user = await getUserByIdAsync(_context, id);
+            var activities = await getActivitiesOfUserAsync(_context, user);
+
+            ActivityData data = new ActivityData(user,activities);
+
+            return View(data);
         }
 
 
@@ -243,27 +260,66 @@ namespace Sjette.Controllers
 
 
         [HttpPost("createActivity")]
-        public async Task<IActionResult> createNewActivity(string activityType, string activityName, decimal totalKms, DateTime startTime, TimeSpan totalTime, string gear, int calories)
+        public async Task<IActionResult> createNewActivity(string activityType, string activityName, string totalKms, DateTime startTime, TimeSpan totalTime, string gear, int calories)
         {
-            bool done = false;
+            if (totalKms.Contains(".")) totalKms = totalKms.Replace(".", ",");
             setUserDictionairy();
 
             Activities Activity = new Activities();
             Activity.fk_UserID = Convert.ToInt32(UserDictionairy["UserID"]);
             Activity.ActivityType = activityType;
             Activity.ActivityName = activityName;
-            Activity.TKm = totalKms;
+            Activity.TKm = Convert.ToDecimal(totalKms);
             Activity.StartTime = startTime;
             Activity.TTime = totalTime;
             Activity.Gear = gear;
             Activity.TotalCalories = calories;
 
-
             _context.Add(Activity);
             await _context.SaveChangesAsync();
+            TempData["Succes"] = "The activity has been succesfully created.";
+
             return Redirect("~/Account");
         }
 
+        // POST: /editActivity
+        [HttpPost("editActivity")]
+        public async Task<IActionResult> editActivity(string redirectUrl, string activityId, string Name, DateTime Date, TimeSpan Duration, string Distance, int Calories, string Gear)
+        {
+            if (Distance.Contains(".")) Distance = Distance.Replace(".", ",");
+            setUserDictionairy();
+
+            Activities Activity = await getActivityByIdAsync(_context, Convert.ToInt32(activityId));
+            Activity.ActivityName = Name;
+            Activity.TKm = Convert.ToDecimal(Distance);
+            Activity.StartTime = Date;
+            Activity.TTime = Duration;
+            Activity.Gear = Gear;
+            Activity.TotalCalories = Calories;
+
+            _context.Activities.Update(Activity);
+            await _context.SaveChangesAsync();
+
+            TempData["Succes"] = "The activity-data has been succesfully updated.";
+            var url = $"~{redirectUrl}";
+            return Redirect(url);
+        }
+
+
+        // POST: /deleteActivity
+        [HttpPost("deleteActivity")]
+        public async Task<IActionResult> deleteActivity(string redirectUrl, string activityId)
+        {
+            setUserDictionairy();
+            Activities Activity = await getActivityByIdAsync(_context, Convert.ToInt32(activityId));
+
+            _context.Activities.Remove(Activity);
+            await _context.SaveChangesAsync();
+
+            TempData["Succes"] = "The activity has been succesfully deleted.";
+            var url = $"~{redirectUrl}";
+            return Redirect(url);
+        }
 
 
         // GET: Account/Group

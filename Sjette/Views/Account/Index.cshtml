@@ -217,7 +217,7 @@
                                     <tr style="cursor:pointer;" onclick="location.href='@url/Activity?ActivityId=@item.pk_ActivityID';">
                                         <td scope="row">@item.ActivityName</td>
                                         <td>@item.ActivityType</td>
-                                        <td>@item.StartTime</td>
+                                        <td>@item.StartTime.ToString("dd/MM/yyyy HH:mm")</td>
                                         <td>@item.TTime</td>
                                         <td>@item.TKm</td>
                                         <td>@item.TotalCalories</td>
