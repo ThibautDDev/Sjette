@@ -28,6 +28,18 @@ namespace Sjette.Controllers
             _context = context;
         }
 
+        private bool HasSpecialChars(string testString)
+        {
+            return testString.Any(c => !Char.IsLetterOrDigit(c));
+        }
+
+
+        private bool HasDigit(string testString)
+        {
+            return testString.Any(char.IsDigit);
+        }
+
+
         // GET: Home/
         public IActionResult Index()
         {
@@ -57,8 +69,14 @@ namespace Sjette.Controllers
             {
                 TempData["PasswordError"] = "Password's don't match.";
                 return View("Register");
-
             }
+
+            if (!HasDigit(nonHashedPassword) || !HasSpecialChars(nonHashedPassword))
+            {
+                TempData["PasswordReqError"] = "Make sure that the password meets the requirements.";
+                return View("Register");
+            }
+
             var UserList = await _context.Users.FromSqlRaw($"SELECT * FROM Users Where Email='{email}'").ToListAsync();
             if (UserList.Count != 0)
             {

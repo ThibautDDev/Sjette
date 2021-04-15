@@ -43,6 +43,17 @@ namespace Sjette.Controllers
         }
 
 
+        private bool HasSpecialChars(string testString)
+        {
+            return testString.Any(c => !Char.IsLetterOrDigit(c));
+        }
+
+
+        private bool HasDigit(string testString) {
+            return testString.Any(char.IsDigit);
+        }
+
+
         /*
          * Function to hash a password with a given hash and non-hashed version of the password.
          * This function is private because of the internal use inside this controller.
@@ -539,27 +550,61 @@ namespace Sjette.Controllers
         [HttpPost("saveSettings")]
         public async Task<IActionResult> SaveSettings(string firstName, string lastName, string email, string oldPassword, string newPassword, string newPasswordConfirm)
         {
+            bool done = false;
             setUserDictionairy();
             var id = Convert.ToInt32(UserDictionairy["UserID"]);
             var user = await getUserByIdAsync(_context, id);
-            var oldPasswordHash = hashPassword(user.Hash, oldPassword);
-            if (user.PasswordHash == oldPasswordHash && newPassword == newPasswordConfirm)
+            var oldPasswordHash = (oldPassword != null) ? hashPassword(user.Hash, oldPassword):"";
+
+            if (firstName != null)
             {
                 user.FirstName = firstName;
+                done = true;
+            }
+            if (lastName != null)
+            {
                 user.LastName = lastName;
+                done = true;
+            }
+            if (email != null)
+            {
                 user.Email = email;
-                user.PasswordHash = hashPassword(user.Hash, newPassword);
-                await _context.SaveChangesAsync();
-                TempData["Succes"] = "Settings were succesfully saved";
-                return Redirect("/Account");
+                done = true;
+            }
+
+            if (user.PasswordHash == oldPasswordHash && newPassword == newPasswordConfirm && newPassword != null)
+            {
+                if (HasSpecialChars(newPassword) && newPassword.Length >= 7 && HasDigit(newPassword))
+                {
+                    user.PasswordHash = hashPassword(user.Hash, newPassword);
+                    done = true;
+                }
+                else TempData["PasswordRequirementsError"] = "Please make sure that the new password meets the requirements.";
+
             } else if (newPassword != newPasswordConfirm)
             {
                 TempData["NewPasswordError"] = "Password did not match with each other.";
+            } else if (newPassword == "")
+            {
+                TempData["NewPasswordError"] = "Please fill in a password";
             } else
             {
                 TempData["PasswordError"] = "Old Password did not match with this account.";
             }
-            return View("Settings");
+
+            if (done)
+            {
+                _context.Users.Update(user);
+                await _context.SaveChangesAsync();
+                TempData["Succes"] = "Settings were succesfully saved";
+                
+            }
+
+            if (done && TempData["PasswordError"] == null && TempData["NewPasswordError"] == null && TempData["PasswordRequirementsError"] == null)
+            {
+                return Redirect("~/Account");
+            } 
+            else return Redirect("~/Account/Settings");
         }
 
 

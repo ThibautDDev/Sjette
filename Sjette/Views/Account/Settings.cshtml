@@ -2,6 +2,14 @@
 @{
     ViewData["Title"] = "Account Settings";
     Layout = "~/Views/Shared/_LayoutAccount.cshtml";
+
+    var pError1 = TempData["PasswordError"] as string;
+    var pError2 = TempData["NewPasswordError"] as string;
+    var pError3 = TempData["PasswordRequirementsError"] as string;
+}
+
+@section Scripts{
+    <script src="~/js/settings.js"></script>
 }
 
 
@@ -10,7 +18,7 @@
         <div class="col-12 col-lg-10 col-xl-8 mx-auto">
             <h1 class="h3 mb-0 text-gray-800">Your Settings, @Model.FirstName</h1>
             <div class="my-4">
-                <form action="~/saveSettings" method="post">
+                <form action="~/saveSettings" method="post" id="settingsForm">
                     <hr class="my-4" />
                     <div class="form-row">
                         <div class="form-group col-md-6">
@@ -30,22 +38,62 @@
                     <div class="row mb-4">
                         <div class="col-md-6">
                             <div class="form-group">
+                                @if (!string.IsNullOrEmpty(pError1))
+                                {
+                                    <label for="inputPassword4">Old Password</label>
+                                    <input name="oldPassword" type="password" class="form-control is-invalid" id="inputPassword4" aria-describedby="passwordHelp1" />
+                                    <small id="passwordHelp1" class="form-text invalid-feedback">@pError1</small>
+                                }
+                                else 
+                                {
                                 <label for="inputPassword4">Old Password</label>
-                                <input name="oldPassword" type="password" class="form-control" id="inputPassword5" />
+                                <input name="oldPassword" type="password" class="form-control" id="inputPassword4" />
+                                }
                             </div>
                             <div class="form-group">
-                                <label for="inputPassword5">New Password</label>
-                                <input name="newPassword" type="password" class="form-control" id="inputPassword5" />
+                                @if (!string.IsNullOrEmpty(pError2))
+                                {
+                                    <label for="inputPassword5">New Password</label>
+                                    <input name="newPassword" type="password" class="form-control is-invalid" id="inputPassword5" aria-describedby="passwordHelp2" />
+                                    <small id="passwordHelp2" class="form-text invalid-feedback">@pError2</small>
+                                }
+                                else if (!string.IsNullOrEmpty(pError3))
+                                {
+                                    <label for="inputPassword5">New Password</label>
+                                    <input name="newPassword" type="password" class="form-control is-invalid" id="inputPassword5" aria-describedby="passwordHelp3" />
+                                    <small id="passwordHelp3" class="form-text invalid-feedback">@pError3</small>
+                                }
+                                else
+                                {
+                                    <label for="inputPassword5">New Password</label>
+                                    <input name="newPassword" type="password" class="form-control" id="inputPassword5" />
+                                }
                             </div>
                             <div class="form-group">
-                                <label for="inputPassword6">Confirm Password</label>
-                                <input name="newPasswordConfirm" type="password" class="form-control" id="inputPassword6" />
+                                @if (!string.IsNullOrEmpty(pError2))
+                                {
+                                    <label for="inputPassword6">Confirm Password</label>
+                                    <input name="newPasswordConfirm" type="password" class="form-control is-invalid" id="inputPassword6" aria-describedby="passwordHelp4" />
+                                    <small id="passwordHelp4" class="form-text invalid-feedback">@pError2</small>
+                                }
+                                else if (!string.IsNullOrEmpty(pError3))
+                                {
+                                    <label for="inputPassword6">Confirm Password</label>
+                                    <input name="newPasswordConfirm" type="password" class="form-control is-invalid" id="inputPassword6" aria-describedby="passwordHelp5" />
+                                    <small id="passwordHelp5" class="form-text invalid-feedback">@pError3</small>
+                                }
+                                else
+                                {
+                                    <label for="inputPassword6">Confirm Password</label>
+                                    <input name="newPasswordConfirm" type="password" class="form-control" id="inputPassword6" />
+                                }
+
                             </div>
                         </div>
                         <div class="col-md-6">
                             <p class="mb-2">Password requirements</p>
                             <p class="small text-muted mb-2">To create a new password, you have to meet the following requirements:</p>
-                            <ul class="small text-muted pl-4 mb-0">
+                            <ul class="small @(!string.IsNullOrEmpty(pError3)?"text-danger":"text-muted")  pl-4 mb-0">
                                 <li>Minimum 8 character</li>
                                 <li>At least one special character</li>
                                 <li>At least one number</li>

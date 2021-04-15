@@ -506,16 +506,6 @@
                                         <p class="h6 hover text-secondary font-weight-bold">Create An Activity</p>
                                     </a>
                                 </li>
-                                <li>
-                                    <a class="hover" asp-controller="Account" asp-action="EditActivity">
-                                        <p class="h6 hover text-secondary font-weight-bold">Edit An Activity</p>
-                                    </a>
-                                </li>
-                                <li>
-                                    <a class="hover" asp-controller="Account" asp-action="DeleteActivity">
-                                        <p class="h6 hover text-secondary font-weight-bold">Delete An Activity</p>
-                                    </a>
-                                </li>
                             </ul>
                         </div>
                         <div class="col-6">
@@ -527,7 +517,7 @@
                                 </li>
                                 <hr />
                                 <li>
-                                    <a class="hover" asp-controller="Account" asp-action="CreateGroup">
+                                    <a class="hover" data-toggle="modal" data-target="#modalCreateGroup" style="cursor:pointer;">
                                         <p class="h6 hover text-secondary font-weight-bold">Create A Group</p>
                                     </a>
                                 </li>
@@ -536,6 +526,33 @@
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modals -->
+<div class="modal fade" id="modalCreateGroup" tabindex="-1" role="dialog" aria-labelledby="modalCreateGroupLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <form method="post" asp-controller="Account" asp-action="createNewGroup">
+                <input type="hidden" name="redirectUrl" value="@url">   @*HIDDEN INPUT FOR REDIRECTINGPAGE*@
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalCreateGroupLabel">Create A Group</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Groupname</label>
+                        <input type="text" class="form-control" required="required" name="name" />
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-success">Create Group</button>
+                </div>
+            </form>
         </div>
     </div>
 </div>

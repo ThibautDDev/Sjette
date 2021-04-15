@@ -192,7 +192,7 @@
                     d += 6;
                 }
                 <li class="nav-item mb-0">
-                    <a class="nav-link" data-toggle="modal" data-target="#modalCreateGroup"><b>Create a new group</b></a>
+                    <a class="nav-link" style="cursor:pointer;" data-toggle="modal" data-target="#modalCreateGroup"><b>Create a new group</b></a>
                 </li>
             </ul>
             <div class="tab-content w-100">
@@ -241,14 +241,14 @@
                                     <div class="card-body">
                                         <ul class="m-0 pl-3">
                                             <li>
-                                                <a class="hover" data-toggle="modal" data-target="#modalAddMemberToGroup">
+                                                <a class="hover" style="cursor:pointer;" data-toggle="modal" data-target="#modalAddMemberToGroup">
                                                     <p class="h6 hover text-secondary font-weight-bold">Add A Member</p>
                                                 </a>
                                             </li>
                                             @if (Model.User.pk_UserID != group.fk_CreatorID)
                                             {
                                                 <li>
-                                                    <a class="hover" data-toggle="modal" data-target="#modalLeaveGroup">
+                                                    <a class="hover" style="cursor:pointer;" data-toggle="modal" data-target="#modalLeaveGroup">
                                                         <p class="h6 hover text-secondary font-weight-bold">Leave Group</p>
                                                     </a>
                                                 </li>
@@ -261,12 +261,12 @@
                                                 @if (Model.AllUsersOfGroup[group.pk_GroupID].Count > 1)
                                                 {
                                                     <li>
-                                                        <a class="hover" data-toggle="modal" data-target="#modalTransferAdmin">
+                                                        <a class="hover" style="cursor:pointer;" data-toggle="modal" data-target="#modalTransferAdmin">
                                                             <p class="h6 hover text-danger font-weight-bold">Admin Transfer</p>
                                                         </a>
                                                     </li>
                                                     <li>
-                                                        <a class="hover" data-toggle="modal" data-target="#modalRemoveMember">
+                                                        <a class="hover" style="cursor:pointer;" data-toggle="modal" data-target="#modalRemoveMember">
                                                             <p class="h6 hover text-danger font-weight-bold">Remove Member</p>
                                                         </a>
                                                     </li>
@@ -275,7 +275,7 @@
                                                 @if (Model.AllUsersOfGroup[group.pk_GroupID].Count == 1)
                                                 {
                                                     <li>
-                                                        <a class="hover" data-toggle="modal" data-target="#modalDeleteGroup">
+                                                        <a class="hover" style="cursor:pointer;" data-toggle="modal" data-target="#modalDeleteGroup">
                                                             <p class="h6 hover text-danger font-weight-bold">Delete Group</p>
                                                         </a>
                                                     </li>
@@ -324,8 +324,8 @@
                                                     <tbody>
                                                         @foreach (var dict in Model.TableData[group.pk_GroupID]["Cycling"])
                                                         {
-                                                            <tr>
-                                                                <td scope="row">@dict.Key</td>
+                                                            <tr style="cursor:pointer;">
+                                                                <td scope="row" style="cursor:pointer;">@dict.Key</td>
                                                                 @{ int f = 0;}
                                                                 @foreach (var item in dict.Value)
                                                                 {
@@ -348,7 +348,7 @@
                                             <div class="tab-pane fade" id="table2_@group.pk_GroupID" role="tabpanel">
                                                 <table class="table table-hover table-sm mb-0" id="table2_@group.GroupName">
                                                     <thead>
-                                                        <tr>
+                                                        <tr >
                                                             @{ e = 0;}
                                                             @foreach (var header in Model.TableHeaders["Running"])
                                                             {
@@ -360,7 +360,7 @@
                                                     <tbody>
                                                         @foreach (var dict in Model.TableData[group.pk_GroupID]["Running"])
                                                         {
-                                                            <tr>
+                                                            <tr style="cursor:pointer;">
                                                                 <td scope="row">@dict.Key</td>
                                                                 @{ int f = 0;}
                                                                 @foreach (var item in dict.Value)
@@ -395,7 +395,7 @@
                                                     <tbody>
                                                         @foreach (var dict in Model.TableData[group.pk_GroupID]["Hiking"])
                                                         {
-                                                            <tr>
+                                                            <tr style="cursor:pointer;">
                                                                 <td scope="row">@dict.Key</td>
                                                                 @{ int f = 0;}
                                                                 @foreach (var item in dict.Value)

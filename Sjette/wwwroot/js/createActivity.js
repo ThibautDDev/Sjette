@@ -1,4 +1,6 @@
 ﻿var currentTab = 0; // Current tab is set to be the first tab (0)
+var typeActivity = "";
+var timeInMinutes = 0;
 showTab(currentTab); // Display the current tab
 
 function showTab(n) {
@@ -51,11 +53,12 @@ function validateForm() {
         if (y[i].type == "radio") {
             radioBtns = true;
             if (y[i].checked) {
+                typeActivity = y[i].value;
                 radioChecked = true;
             }
         }
         // If a field is empty...
-        if (y[i].value == "") {
+        if (y[i].value == "" && y[i].id != "gear" && y[i].id != "calories") {
             // add an "invalid" class to the field:
             y[i].className += " is-invalid";
             // and set the current valid status to false:
@@ -63,13 +66,29 @@ function validateForm() {
         } else {
             y[i].className = "form-control";
         }
+
+        if (y[i].id == "totalTime") {
+            var time = y[i].value.split(":")
+            timeInMinutes = (parseInt(time[0]) * 60) + parseInt(time[1]) + (parseInt(time[2]) / 60)
+            console.log(time, timeInMinutes)
+        }
+
+        if (y[i].id == "calories" && y[i].value == "") {
+            if (typeActivity == "Cycling") MET = 12;
+            else if (typeActivity == "Running") MET = 10;
+            else MET = 5;
+
+            var calories = ((MET * 65 * 3.5) / 200) * timeInMinutes
+            y[i].value = Math.round(calories)
+            console.log(typeActivity, timeInMinutes, calories)
+            valid = false;
+        }
     }
     if (radioBtns && !radioChecked) {
         valid = false;
     }
-    if (y[0].id == "gear") {
-        valid = true;
-    }
+
+
     // If the valid status is true, mark the step as finished and valid:
     if (valid) {
         document.getElementsByClassName("step")[currentTab].className += " finish";

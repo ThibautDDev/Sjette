@@ -3,6 +3,7 @@
     Layout = "~/Views/Shared/_LayoutLogin.cshtml";
     var pError = TempData["PasswordError"] as string;
     var eError = TempData["EmailError"] as string;
+    var prError = TempData["PasswordReqError"] as string;
 }
 
 <div class="d-flex justify-content-center contentHeight">
@@ -30,22 +31,53 @@
                         <input type="email" class="form-control" name="email" aria-describedby="emailHelp" placeholder="Email" required="required">
                     </div>
                 }
-                <div class="form-group">
-                    <input type="password" class="form-control" name="nonHashedPassword" placeholder="Password" required="required">
+
+                <div class="row">
+                    <div class="col-md-7">
+
+                        @if (!string.IsNullOrEmpty(pError))
+                        {
+                            <div class="form-group">
+                                <input type="password" class="form-control is-invalid" aria-describedby="passwordHelp1" name="nonHashedPassword" placeholder="Password" required="required">
+                                <small id="passwordHelp1" class="form-text invalid-feedback">@pError</small>
+                            </div>
+                            <div class="form-group">
+                                <input type="password" aria-describedby="passwordHelp2" class="form-control is-invalid" name="confirm_nonHashedPassword" placeholder="Confirm Password" required="required">
+                                <small id="passwordHelp2" class="form-text invalid-feedback">@pError</small>
+                            </div>
+                        }
+                        else if (!string.IsNullOrEmpty(prError))
+                        {
+                            <div class="form-group">
+                                <input type="password" class="form-control is-invalid" aria-describedby="passwordHelp1" name="nonHashedPassword" placeholder="Password" required="required">
+                                <small id="passwordHelp1" class="form-text invalid-feedback">@prError</small>
+                            </div>
+                            <div class="form-group">
+                                <input type="password" aria-describedby="passwordHelp2" class="form-control is-invalid" name="confirm_nonHashedPassword" placeholder="Confirm Password" required="required">
+                                <small id="passwordHelp2" class="form-text invalid-feedback">@prError</small>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="form-group">
+                                <input type="password" class="form-control" name="nonHashedPassword" placeholder="Password" required="required">
+                            </div>
+                            <div class="form-group">
+                                <input type="password" class="form-control" name="confirm_nonHashedPassword" placeholder="Confirm Password" required="required">
+                            </div>
+                        }
+                    </div>
+
+                    <div class="col-md-5">
+                        <p class="mb-2">Password requirements</p>
+                        <p class="small text-muted mb-2">To create a password, you have to meet the following requirements:</p>
+                        <ul class="small @(!string.IsNullOrEmpty(prError)?"text-danger":"text-muted")  pl-4 mb-0">
+                            <li>Minimum 8 character</li>
+                            <li>At least one special character</li>
+                            <li>At least one number</li>
+                        </ul>
+                    </div>
                 </div>
-                @if (!string.IsNullOrEmpty(pError))
-                {
-                    <div class="form-group">
-                        <input type="password" aria-describedby="passwordHelp" class="form-control is-invalid" name="confirm_nonHashedPassword" placeholder="Confirm Password" required="required">
-                        <small id="passwordHelp" class="form-text invalid-feedback">@pError</small>
-                    </div>
-                }
-                else
-                { 
-                    <div class="form-group">
-                        <input type="password" aria-describedby="passwordHelp" class="form-control" name="confirm_nonHashedPassword" placeholder="Confirm Password" required="required">
-                    </div>
-                }
 
                 <div class="form-group">
                     <label class="form-check-label"><input type="checkbox" required="required"> I accept the <a href="#">Terms of Use</a> &amp; <a href="#">Privacy Policy</a></label>

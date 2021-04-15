@@ -3,7 +3,7 @@
     x.value = id;
 
     var parent = e.parentElement;
-    var columns = parent.cells
+    var columns = parent.cells;
     //console.log(columns);
     var type = "Normal";
     if (columns.length == 8) type = "All";
@@ -26,44 +26,36 @@
             input.classList += ["form-control"];
             input.required = true;
             input.name = header;
+            input.value = columns[i].innerHTML;
 
             if (header == "Date") {
                 input.type = "datetime-local";
                 var date = columns[i].innerHTML.split(" ")[0].split("/");
                 var time = columns[i].innerHTML.split(" ")[1];
-                //console.log(date, time);
                 input.value = `${date[2]}-${date[1]}-${date[0]}T${time}`;
 
             } else if (header == "Duration") {
                 input.type = "time";
-                var time = columns[i].innerHTML;
-                input.value = time;
                 input.step = 1;
             } else if (header == "Calories" || header == "Distance") {
                 input.type = "number";
                 input.min = 1;
                 input.step = 0.01;
-                console.log(columns[i].innerHTML)
-                input.value = columns[i].innerHTML;
-            } else if (header == "Calories" || header == "Gear") {
-                input.required = false;
-            } else {
-                input.type = "text";
-                input.value = columns[i].innerHTML;
             }
 
-            group.appendChild(label)
-            group.appendChild(input)
+            if (header == "Calories" || header == "Gear") input.required = false;
 
-            body.append(group)
-            //console.log(header)
+            group.appendChild(label);
+            group.appendChild(input);
+
+            body.append(group);
+            //console.log(header);
         }
-        console.log(body)
+        console.log(body);
     }
 
 
     var x = document.getElementById("deleteActivityId");
     x.value = id;
-
     //console.log(e)
 }

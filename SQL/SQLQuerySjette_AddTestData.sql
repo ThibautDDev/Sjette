@@ -8,21 +8,21 @@ GO
 --Dummies generated with 'https://nl.fakenamegenerator.com/gen-male-nl-bg.php'
 INSERT INTO Users (FirstName, LastName, [Admin], Email,	PasswordHash, [Hash], CreationDate)
 VALUES 
-	('Thibaut',	'Deliever',			1, 'thibaut.deliever@dummie.be',		'J00D3B+rg3L2Flq4RJ27/3gpQh9HRL50SgcsUYJxO5I=', 'XaY6iCflqGpd18sBBt/UdpV2psxfhMaNiV78j3Wl0KU=', '2021-03-22'),
-	('Leander',	'Deweerdt',			0, 'leander.deweerdt@dummie.be',		'J00D3B+rg3L2Flq4RJ27/3gpQh9HRL50SgcsUYJxO5I=', 'XaY6iCflqGpd18sBBt/UdpV2psxfhMaNiV78j3Wl0KU=', '2021-03-22'),
-	('Faisal',	'Ahktar',			0, 'faisal.ahktar@dummie.be',			'J00D3B+rg3L2Flq4RJ27/3gpQh9HRL50SgcsUYJxO5I=', 'XaY6iCflqGpd18sBBt/UdpV2psxfhMaNiV78j3Wl0KU=', '2021-03-22'),
-	('Steije',	'Hoppenbrouwers',	0, 'steije.hoppenbrouwers@dummie.be',	'J00D3B+rg3L2Flq4RJ27/3gpQh9HRL50SgcsUYJxO5I=', 'XaY6iCflqGpd18sBBt/UdpV2psxfhMaNiV78j3Wl0KU=', '2021-03-22'),
-	('Enzio',	'Feenstra',			0, 'enzio.feenstra@dummie.be',			'J00D3B+rg3L2Flq4RJ27/3gpQh9HRL50SgcsUYJxO5I=', 'XaY6iCflqGpd18sBBt/UdpV2psxfhMaNiV78j3Wl0KU=', '2021-03-23'),
-	('Nander',	'Hoefnagels',		0, 'nander.hoefnagels@dummie.be',		'J00D3B+rg3L2Flq4RJ27/3gpQh9HRL50SgcsUYJxO5I=', 'XaY6iCflqGpd18sBBt/UdpV2psxfhMaNiV78j3Wl0KU=', '2021-03-24'),
-	('Mansour',	'Davis',			0, 'mansour.davis@dummie.be',			'J00D3B+rg3L2Flq4RJ27/3gpQh9HRL50SgcsUYJxO5I=', 'XaY6iCflqGpd18sBBt/UdpV2psxfhMaNiV78j3Wl0KU=', '2021-03-25'),
-	('Elvi',	'Schoofs',			0, 'elvi.schoofs@dummie.be',			'J00D3B+rg3L2Flq4RJ27/3gpQh9HRL50SgcsUYJxO5I=', 'XaY6iCflqGpd18sBBt/UdpV2psxfhMaNiV78j3Wl0KU=', '2021-03-26'),
-	('Tomas',	'Jansens',			0, 'Tomas.jansens@dummie.be',			'J00D3B+rg3L2Flq4RJ27/3gpQh9HRL50SgcsUYJxO5I=', 'XaY6iCflqGpd18sBBt/UdpV2psxfhMaNiV78j3Wl0KU=', '2021-03-27'),
-	('Madelief','Van Der Drift',	0, 'madelief.vanderdrift@dummie.be',	'J00D3B+rg3L2Flq4RJ27/3gpQh9HRL50SgcsUYJxO5I=', 'XaY6iCflqGpd18sBBt/UdpV2psxfhMaNiV78j3Wl0KU=', '2021-03-28'),
-	('Charlie',	'Gijzen',			0, 'charlie.gijzen@dummie.be',			'J00D3B+rg3L2Flq4RJ27/3gpQh9HRL50SgcsUYJxO5I=', 'XaY6iCflqGpd18sBBt/UdpV2psxfhMaNiV78j3Wl0KU=', '2021-03-29'),
-	('Micheal',	'Wingelaar',		0, 'micheal.wingelaar@dummie.be',		'J00D3B+rg3L2Flq4RJ27/3gpQh9HRL50SgcsUYJxO5I=', 'XaY6iCflqGpd18sBBt/UdpV2psxfhMaNiV78j3Wl0KU=', '2021-03-29'),
-	('Mathijs',	'Van Den Kerkhove',	0, 'mathijs.vandenkerkhove@dummie.be',	'J00D3B+rg3L2Flq4RJ27/3gpQh9HRL50SgcsUYJxO5I=', 'XaY6iCflqGpd18sBBt/UdpV2psxfhMaNiV78j3Wl0KU=', '2021-03-29'),
-	('Yanick',	'Declercq',			0, 'yanick.declercq@dummie.be',			'J00D3B+rg3L2Flq4RJ27/3gpQh9HRL50SgcsUYJxO5I=', 'XaY6iCflqGpd18sBBt/UdpV2psxfhMaNiV78j3Wl0KU=', '2021-03-29'),
-	('Jurgen',	'Van Den Bulcke',	0, 'jurgen.vandenbulcke@dummie.be',		'J00D3B+rg3L2Flq4RJ27/3gpQh9HRL50SgcsUYJxO5I=', 'XaY6iCflqGpd18sBBt/UdpV2psxfhMaNiV78j3Wl0KU=', '2021-03-30');
+	('Thibaut',	'Deliever',			1, 'thibaut.deliever@dummie.be',		'gqcDhyRRIRr3FEm1QMiToj28k4W65cy3X/nsHLarE1M=', 'XaY6iCflqGpd18sBBt/UdpV2psxfhMaNiV78j3Wl0KU=', '2021-03-22'),
+	('Leander',	'Deweerdt',			0, 'leander.deweerdt@dummie.be',		'gqcDhyRRIRr3FEm1QMiToj28k4W65cy3X/nsHLarE1M=', 'XaY6iCflqGpd18sBBt/UdpV2psxfhMaNiV78j3Wl0KU=', '2021-03-22'),
+	('Faisal',	'Ahktar',			0, 'faisal.ahktar@dummie.be',			'gqcDhyRRIRr3FEm1QMiToj28k4W65cy3X/nsHLarE1M=', 'XaY6iCflqGpd18sBBt/UdpV2psxfhMaNiV78j3Wl0KU=', '2021-03-22'),
+	('Steije',	'Hoppenbrouwers',	0, 'steije.hoppenbrouwers@dummie.be',	'gqcDhyRRIRr3FEm1QMiToj28k4W65cy3X/nsHLarE1M=', 'XaY6iCflqGpd18sBBt/UdpV2psxfhMaNiV78j3Wl0KU=', '2021-03-22'),
+	('Enzio',	'Feenstra',			0, 'enzio.feenstra@dummie.be',			'gqcDhyRRIRr3FEm1QMiToj28k4W65cy3X/nsHLarE1M=', 'XaY6iCflqGpd18sBBt/UdpV2psxfhMaNiV78j3Wl0KU=', '2021-03-23'),
+	('Nander',	'Hoefnagels',		0, 'nander.hoefnagels@dummie.be',		'gqcDhyRRIRr3FEm1QMiToj28k4W65cy3X/nsHLarE1M=', 'XaY6iCflqGpd18sBBt/UdpV2psxfhMaNiV78j3Wl0KU=', '2021-03-24'),
+	('Mansour',	'Davis',			0, 'mansour.davis@dummie.be',			'gqcDhyRRIRr3FEm1QMiToj28k4W65cy3X/nsHLarE1M=', 'XaY6iCflqGpd18sBBt/UdpV2psxfhMaNiV78j3Wl0KU=', '2021-03-25'),
+	('Elvi',	'Schoofs',			0, 'elvi.schoofs@dummie.be',			'gqcDhyRRIRr3FEm1QMiToj28k4W65cy3X/nsHLarE1M=', 'XaY6iCflqGpd18sBBt/UdpV2psxfhMaNiV78j3Wl0KU=', '2021-03-26'),
+	('Tomas',	'Jansens',			0, 'Tomas.jansens@dummie.be',			'gqcDhyRRIRr3FEm1QMiToj28k4W65cy3X/nsHLarE1M=', 'XaY6iCflqGpd18sBBt/UdpV2psxfhMaNiV78j3Wl0KU=', '2021-03-27'),
+	('Madelief','Van Der Drift',	0, 'madelief.vanderdrift@dummie.be',	'gqcDhyRRIRr3FEm1QMiToj28k4W65cy3X/nsHLarE1M=', 'XaY6iCflqGpd18sBBt/UdpV2psxfhMaNiV78j3Wl0KU=', '2021-03-28'),
+	('Charlie',	'Gijzen',			0, 'charlie.gijzen@dummie.be',			'gqcDhyRRIRr3FEm1QMiToj28k4W65cy3X/nsHLarE1M=', 'XaY6iCflqGpd18sBBt/UdpV2psxfhMaNiV78j3Wl0KU=', '2021-03-29'),
+	('Micheal',	'Wingelaar',		0, 'micheal.wingelaar@dummie.be',		'gqcDhyRRIRr3FEm1QMiToj28k4W65cy3X/nsHLarE1M=', 'XaY6iCflqGpd18sBBt/UdpV2psxfhMaNiV78j3Wl0KU=', '2021-03-29'),
+	('Mathijs',	'Van Den Kerkhove',	0, 'mathijs.vandenkerkhove@dummie.be',	'gqcDhyRRIRr3FEm1QMiToj28k4W65cy3X/nsHLarE1M=', 'XaY6iCflqGpd18sBBt/UdpV2psxfhMaNiV78j3Wl0KU=', '2021-03-29'),
+	('Yanick',	'Declercq',			0, 'yanick.declercq@dummie.be',			'gqcDhyRRIRr3FEm1QMiToj28k4W65cy3X/nsHLarE1M=', 'XaY6iCflqGpd18sBBt/UdpV2psxfhMaNiV78j3Wl0KU=', '2021-03-29'),
+	('Jurgen',	'Van Den Bulcke',	0, 'jurgen.vandenbulcke@dummie.be',		'gqcDhyRRIRr3FEm1QMiToj28k4W65cy3X/nsHLarE1M=', 'XaY6iCflqGpd18sBBt/UdpV2psxfhMaNiV78j3Wl0KU=', '2021-03-30');
 
 
 

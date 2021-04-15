@@ -23,7 +23,7 @@
 <div class="d-flex justify-content-center contentHeight">
     <div class="align-self-center">
         <div class="p-4 rounded formBackground">
-            <form id="regForm" action="/createActivity" method="post">
+            <form id="regForm" action="/createActivity" name="regForm" onsubmit="return formControlBeforeSubmit()" method="post">
                 <div class="text-center pb-4">
                     <h1 class="display-4">Create a new activity</h1>
                 </div>
@@ -55,7 +55,7 @@
                     </div>
                     <div class="form-group">
                         <label for="totalKms">Total amount of kilometers</label>
-                        <input required name="totalKms" id="totalKms" placeholder="Enter amount of kms" class="form-control" type="number" min="1">
+                        <input required name="totalKms" id="totalKms" placeholder="Enter amount of kms" class="form-control" type="number" min="0.01" step="0.01">
                     </div>
                 </div>
 
@@ -66,7 +66,7 @@
                     </div>
                     <div class="form-group">
                         <label for="totalTime">Duration</label>
-                        <input required name="totalTime" id="totalTime" placeholder="Enter a time" class="form-control" type="time">
+                        <input required name="totalTime" id="totalTime" placeholder="Enter a time" class="form-control" type="time" step="1">
                     </div>
                 </div>
 
