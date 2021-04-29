@@ -170,7 +170,15 @@
                 </div>
                 <div class="card-body">
                     <div class="chart-pie pt-4 pb-2">
-                        <canvas id="myPieChart"></canvas>
+                        @if ((Model.ActivitiesCycling.Count + Model.ActivitiesHiking.Count + Model.ActivitiesRunning.Count) == 0)
+                        {
+                            <div class="text-center">No activities yet!</div>
+                        }
+                        else
+                        {
+                            <canvas id="myPieChart"></canvas>
+                        }
+
                     </div>
                     <div class="mt-4 text-center small">
                         <span class="mr-2">
@@ -228,7 +236,7 @@
                     }
                     else
                     {
-                        <div>No recent activities found. Add a new one <a href="/Account/CreateActivity">here!</a></div>
+                        <div>No recent activities found. Add a new one <a asp-controller="Account" asp-action="createActivity">here!</a></div>
                     }
 
 
@@ -246,35 +254,43 @@
                     <h6 class="m-0 font-weight-bold text-primary">Rank In Your Groups (Most Activities)</h6>
                 </div>
                 <div class="card-body">
-                    @foreach (var item in Model.UserGroups)
+                    @if (Model.UserGroups.Count < 1)
                     {
-                        <div style="cursor:pointer; user-select:none;" class="hover" onclick="location.href='@url/Group?GroupId=@item.pk_GroupID'">
-                            <h4 class="small font-weight-bold">
-                                @item.GroupName <span class="float-right">@Model.GroupRankingByProperty["Activities"][item.pk_GroupID][0]<sup>th</sup> / @Model.GroupRankingByProperty["Activities"][item.pk_GroupID][1]</span>
-                            </h4>
-                            <div class="progress mb-4">
-                                @if (@Model.GroupRankingByProperty["Activities"][item.pk_GroupID][2] < 30)
-                                {
-                                    <div class="progress-bar bg-danger" role="progressbar" style="width:@Model.GroupRankingByProperty["Activities"][item.pk_GroupID][2]%"
-                                         aria-valuemin="0" aria-valuemax="100">
-                                    </div>
-
-                                }
-                                else if (@Model.GroupRankingByProperty["Activities"][item.pk_GroupID][2] < 70)
-                                {
-                                    <div class="progress-bar bg-warning" role="progressbar" style="width:@Model.GroupRankingByProperty["Activities"][item.pk_GroupID][2]%"
-                                         aria-valuemin="0" aria-valuemax="100">
-                                    </div>
-                                }
-                                else
-                                {
-                                    <div class="progress-bar bg-success" role="progressbar" style="width:@Model.GroupRankingByProperty["Activities"][item.pk_GroupID][2]%"
-                                         aria-valuemin="0" aria-valuemax="100">
-                                    </div>
-                                }
-                            </div>
-                        </div>
+                        <div>No groups found. Ask a member of an existing group to add you or make your own one <a asp-controller="Account" asp-action="Group">here!</a></div>
                     }
+                    else
+                    {
+                        foreach (var item in Model.UserGroups)
+                        {
+                            <div style="cursor:pointer; user-select:none;" class="hover" onclick="location.href='@url/Group?GroupId=@item.pk_GroupID'">
+                                <h4 class="small font-weight-bold">
+                                    @item.GroupName <span class="float-right">@Model.GroupRankingByProperty["Activities"][item.pk_GroupID][0]<sup>th</sup> / @Model.GroupRankingByProperty["Activities"][item.pk_GroupID][1]</span>
+                                </h4>
+                                <div class="progress mb-4">
+                                    @if (@Model.GroupRankingByProperty["Activities"][item.pk_GroupID][2] < 30)
+                                    {
+                                        <div class="progress-bar bg-danger" role="progressbar" style="width:@Model.GroupRankingByProperty["Activities"][item.pk_GroupID][2]%"
+                                             aria-valuemin="0" aria-valuemax="100">
+                                        </div>
+
+                                    }
+                                    else if (@Model.GroupRankingByProperty["Activities"][item.pk_GroupID][2] < 70)
+                                    {
+                                        <div class="progress-bar bg-warning" role="progressbar" style="width:@Model.GroupRankingByProperty["Activities"][item.pk_GroupID][2]%"
+                                             aria-valuemin="0" aria-valuemax="100">
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <div class="progress-bar bg-success" role="progressbar" style="width:@Model.GroupRankingByProperty["Activities"][item.pk_GroupID][2]%"
+                                             aria-valuemin="0" aria-valuemax="100">
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        }
+                    }
+
 
                 </div>
             </div>
@@ -284,74 +300,87 @@
                     <h6 class="m-0 font-weight-bold text-primary">Rank In Your Groups (Most Cycling Activities)</h6>
                 </div>
                 <div class="card-body">
-                    @foreach (var item in Model.UserGroups)
+                    @if (Model.UserGroups.Count < 1)
                     {
-                        <div style="cursor:pointer; user-select:none;" class="hover" onclick="location.href='@url/Group?GroupId=@item.pk_GroupID'">
-                            <h4 class="small font-weight-bold">
-                                @item.GroupName <span class="float-right">@Model.GroupRankingByProperty["Cycling"][item.pk_GroupID][0]<sup>th</sup> / @Model.GroupRankingByProperty["Cycling"][item.pk_GroupID][1]</span>
-                            </h4>
-                            <div class="progress mb-4">
-                                @if (Model.GroupRankingByProperty["Cycling"][item.pk_GroupID][2] < 30)
-                                {
-                                    <div class="progress-bar bg-danger" role="progressbar" style="width:@Model.GroupRankingByProperty["Cycling"][item.pk_GroupID][2]%"
-                                         aria-valuemin="0" aria-valuemax="100">
-                                    </div>
-
-                                }
-                                else if (Model.GroupRankingByProperty["Cycling"][item.pk_GroupID][2] < 70)
-                                {
-                                    <div class="progress-bar bg-warning" role="progressbar" style="width:@Model.GroupRankingByProperty["Cycling"][item.pk_GroupID][2]%"
-                                         aria-valuemin="0" aria-valuemax="100">
-                                    </div>
-                                }
-                                else
-                                {
-                                    <div class="progress-bar bg-success" role="progressbar" style="width:@Model.GroupRankingByProperty["Cycling"][item.pk_GroupID][2]%"
-                                         aria-valuemin="0" aria-valuemax="100">
-                                    </div>
-                                }
-                            </div>
-                        </div>
+                        <div>No groups found. Ask a member of an existing group to add you or make your own one <a asp-controller="Account" asp-action="Group">here!</a></div>
                     }
+                    else
+                    {
+                        @foreach (var item in Model.UserGroups)
+                        {
+                            <div style="cursor:pointer; user-select:none;" class="hover" onclick="location.href='@url/Group?GroupId=@item.pk_GroupID'">
+                                <h4 class="small font-weight-bold">
+                                    @item.GroupName <span class="float-right">@Model.GroupRankingByProperty["Cycling"][item.pk_GroupID][0]<sup>th</sup> / @Model.GroupRankingByProperty["Cycling"][item.pk_GroupID][1]</span>
+                                </h4>
+                                <div class="progress mb-4">
+                                    @if (Model.GroupRankingByProperty["Cycling"][item.pk_GroupID][2] < 30)
+                                    {
+                                        <div class="progress-bar bg-danger" role="progressbar" style="width:@Model.GroupRankingByProperty["Cycling"][item.pk_GroupID][2]%"
+                                             aria-valuemin="0" aria-valuemax="100">
+                                        </div>
 
+                                    }
+                                    else if (Model.GroupRankingByProperty["Cycling"][item.pk_GroupID][2] < 70)
+                                    {
+                                        <div class="progress-bar bg-warning" role="progressbar" style="width:@Model.GroupRankingByProperty["Cycling"][item.pk_GroupID][2]%"
+                                             aria-valuemin="0" aria-valuemax="100">
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <div class="progress-bar bg-success" role="progressbar" style="width:@Model.GroupRankingByProperty["Cycling"][item.pk_GroupID][2]%"
+                                             aria-valuemin="0" aria-valuemax="100">
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        }
+                    }
                 </div>
             </div>
+
 
             <div class="rankingCards d-none card shadow mb-4">
                 <div style="cursor:pointer; user-select:none;" onclick="changeRankingCard(2,3)" class="card-header py-3 hoverHeader">
                     <h6 class="m-0 font-weight-bold text-primary">Rank In Your Groups (Most Running Activities)</h6>
                 </div>
                 <div class="card-body">
-                    @foreach (var item in Model.UserGroups)
+                    @if (Model.UserGroups.Count < 1)
                     {
-                        <div style="cursor:pointer; user-select:none;" class="hover" onclick="location.href='@url/Group?GroupId=@item.pk_GroupID'">
-                            <h4 class="small font-weight-bold">
-                                @item.GroupName <span class="float-right">@Model.GroupRankingByProperty["Running"][item.pk_GroupID][0]<sup>th</sup> / @Model.GroupRankingByProperty["Running"][item.pk_GroupID][1]</span>
-                            </h4>
-                            <div class="progress mb-4">
-                                @if (Model.GroupRankingByProperty["Running"][item.pk_GroupID][2] < 30)
-                                {
-                                    <div class="progress-bar bg-danger" role="progressbar" style="width:@Model.GroupRankingByProperty["Running"][item.pk_GroupID][2]%"
-                                         aria-valuemin="0" aria-valuemax="100">
-                                    </div>
-
-                                }
-                                else if (Model.GroupRankingByProperty["Running"][item.pk_GroupID][2] < 70)
-                                {
-                                    <div class="progress-bar bg-warning" role="progressbar" style="width:@Model.GroupRankingByProperty["Running"][item.pk_GroupID][2]%"
-                                         aria-valuemin="0" aria-valuemax="100">
-                                    </div>
-                                }
-                                else
-                                {
-                                    <div class="progress-bar bg-success" role="progressbar" style="width:@Model.GroupRankingByProperty["Running"][item.pk_GroupID][2]%"
-                                         aria-valuemin="0" aria-valuemax="100">
-                                    </div>
-                                }
-                            </div>
-                        </div>
+                        <div>No groups found. Ask a member of an existing group to add you or make your own one <a asp-controller="Account" asp-action="Group">here!</a></div>
                     }
+                    else
+                    {
+                        @foreach (var item in Model.UserGroups)
+                        {
+                            <div style="cursor:pointer; user-select:none;" class="hover" onclick="location.href='@url/Group?GroupId=@item.pk_GroupID'">
+                                <h4 class="small font-weight-bold">
+                                    @item.GroupName <span class="float-right">@Model.GroupRankingByProperty["Running"][item.pk_GroupID][0]<sup>th</sup> / @Model.GroupRankingByProperty["Running"][item.pk_GroupID][1]</span>
+                                </h4>
+                                <div class="progress mb-4">
+                                    @if (Model.GroupRankingByProperty["Running"][item.pk_GroupID][2] < 30)
+                                    {
+                                        <div class="progress-bar bg-danger" role="progressbar" style="width:@Model.GroupRankingByProperty["Running"][item.pk_GroupID][2]%"
+                                             aria-valuemin="0" aria-valuemax="100">
+                                        </div>
 
+                                    }
+                                    else if (Model.GroupRankingByProperty["Running"][item.pk_GroupID][2] < 70)
+                                    {
+                                        <div class="progress-bar bg-warning" role="progressbar" style="width:@Model.GroupRankingByProperty["Running"][item.pk_GroupID][2]%"
+                                             aria-valuemin="0" aria-valuemax="100">
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <div class="progress-bar bg-success" role="progressbar" style="width:@Model.GroupRankingByProperty["Running"][item.pk_GroupID][2]%"
+                                             aria-valuemin="0" aria-valuemax="100">
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        }
+                    }
                 </div>
             </div>
 
@@ -360,36 +389,42 @@
                     <h6 class="m-0 font-weight-bold text-primary">Rank In Your Groups (Most Hiking Activities)</h6>
                 </div>
                 <div class="card-body">
-                    @foreach (var item in Model.UserGroups)
+                    @if (Model.UserGroups.Count < 1)
                     {
-                        <div style="cursor:pointer; user-select:none;" class="hover" onclick="location.href='@url/Group?GroupId=@item.pk_GroupID'">
-                            <h4 class="small font-weight-bold">
-                                @item.GroupName <span class="float-right">@Model.GroupRankingByProperty["Hiking"][item.pk_GroupID][0]<sup>th</sup> / @Model.GroupRankingByProperty["Hiking"][item.pk_GroupID][1]</span>
-                            </h4>
-                            <div class="progress mb-4">
-                                @if (Model.GroupRankingByProperty["Hiking"][item.pk_GroupID][2] < 30)
-                                {
-                                    <div class="progress-bar bg-danger" role="progressbar" style="width:@Model.GroupRankingByProperty["Hiking"][item.pk_GroupID][2]%"
-                                         aria-valuemin="0" aria-valuemax="100">
-                                    </div>
-
-                                }
-                                else if (Model.GroupRankingByProperty["Hiking"][item.pk_GroupID][2] < 70)
-                                {
-                                    <div class="progress-bar bg-warning" role="progressbar" style="width:@Model.GroupRankingByProperty["Hiking"][item.pk_GroupID][2]%"
-                                         aria-valuemin="0" aria-valuemax="100">
-                                    </div>
-                                }
-                                else
-                                {
-                                    <div class="progress-bar bg-success" role="progressbar" style="width:@Model.GroupRankingByProperty["Hiking"][item.pk_GroupID][2]%"
-                                         aria-valuemin="0" aria-valuemax="100">
-                                    </div>
-                                }
-                            </div>
-                        </div>
+                        <div>No groups found. Ask a member of an existing group to add you or make your own one <a asp-controller="Account" asp-action="Group">here!</a></div>
                     }
+                    else
+                    {
+                        @foreach (var item in Model.UserGroups)
+                        {
+                            <div style="cursor:pointer; user-select:none;" class="hover" onclick="location.href='@url/Group?GroupId=@item.pk_GroupID'">
+                                <h4 class="small font-weight-bold">
+                                    @item.GroupName <span class="float-right">@Model.GroupRankingByProperty["Hiking"][item.pk_GroupID][0]<sup>th</sup> / @Model.GroupRankingByProperty["Hiking"][item.pk_GroupID][1]</span>
+                                </h4>
+                                <div class="progress mb-4">
+                                    @if (Model.GroupRankingByProperty["Hiking"][item.pk_GroupID][2] < 30)
+                                    {
+                                        <div class="progress-bar bg-danger" role="progressbar" style="width:@Model.GroupRankingByProperty["Hiking"][item.pk_GroupID][2]%"
+                                             aria-valuemin="0" aria-valuemax="100">
+                                        </div>
 
+                                    }
+                                    else if (Model.GroupRankingByProperty["Hiking"][item.pk_GroupID][2] < 70)
+                                    {
+                                        <div class="progress-bar bg-warning" role="progressbar" style="width:@Model.GroupRankingByProperty["Hiking"][item.pk_GroupID][2]%"
+                                             aria-valuemin="0" aria-valuemax="100">
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <div class="progress-bar bg-success" role="progressbar" style="width:@Model.GroupRankingByProperty["Hiking"][item.pk_GroupID][2]%"
+                                             aria-valuemin="0" aria-valuemax="100">
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        }
+                    }
                 </div>
             </div>
 
@@ -399,36 +434,42 @@
                     <h6 class="m-0 font-weight-bold text-primary">Rank In Your Groups (Most Distance)</h6>
                 </div>
                 <div class="card-body">
-                    @foreach (var item in Model.UserGroups)
+                    @if (Model.UserGroups.Count < 1)
                     {
-                        <div style="cursor:pointer; user-select:none;" class="hover" onclick="location.href='@url/Group?GroupId=@item.pk_GroupID'">
-                            <h4 class="small font-weight-bold">
-                                @item.GroupName <span class="float-right">@Model.GroupRankingByProperty["Distance"][item.pk_GroupID][0]<sup>th</sup> / @Model.GroupRankingByProperty["Distance"][item.pk_GroupID][1]</span>
-                            </h4>
-                            <div class="progress mb-4">
-                                @if (Model.GroupRankingByProperty["Distance"][item.pk_GroupID][2] < 30)
-                                {
-                                    <div class="progress-bar bg-danger" role="progressbar" style="width:@Model.GroupRankingByProperty["Distance"][item.pk_GroupID][2]%"
-                                         aria-valuemin="0" aria-valuemax="100">
-                                    </div>
-
-                                }
-                                else if (Model.GroupRankingByProperty["Distance"][item.pk_GroupID][2] < 70)
-                                {
-                                    <div class="progress-bar bg-warning" role="progressbar" style="width:@Model.GroupRankingByProperty["Distance"][item.pk_GroupID][2]%"
-                                         aria-valuemin="0" aria-valuemax="100">
-                                    </div>
-                                }
-                                else
-                                {
-                                    <div class="progress-bar bg-success" role="progressbar" style="width:@Model.GroupRankingByProperty["Distance"][item.pk_GroupID][2]%"
-                                         aria-valuemin="0" aria-valuemax="100">
-                                    </div>
-                                }
-                            </div>
-                        </div>
+                        <div>No groups found. Ask a member of an existing group to add you or make your own one <a asp-controller="Account" asp-action="Group">here!</a></div>
                     }
+                    else
+                    {
+                        @foreach (var item in Model.UserGroups)
+                        {
+                            <div style="cursor:pointer; user-select:none;" class="hover" onclick="location.href='@url/Group?GroupId=@item.pk_GroupID'">
+                                <h4 class="small font-weight-bold">
+                                    @item.GroupName <span class="float-right">@Model.GroupRankingByProperty["Distance"][item.pk_GroupID][0]<sup>th</sup> / @Model.GroupRankingByProperty["Distance"][item.pk_GroupID][1]</span>
+                                </h4>
+                                <div class="progress mb-4">
+                                    @if (Model.GroupRankingByProperty["Distance"][item.pk_GroupID][2] < 30)
+                                    {
+                                        <div class="progress-bar bg-danger" role="progressbar" style="width:@Model.GroupRankingByProperty["Distance"][item.pk_GroupID][2]%"
+                                             aria-valuemin="0" aria-valuemax="100">
+                                        </div>
 
+                                    }
+                                    else if (Model.GroupRankingByProperty["Distance"][item.pk_GroupID][2] < 70)
+                                    {
+                                        <div class="progress-bar bg-warning" role="progressbar" style="width:@Model.GroupRankingByProperty["Distance"][item.pk_GroupID][2]%"
+                                             aria-valuemin="0" aria-valuemax="100">
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <div class="progress-bar bg-success" role="progressbar" style="width:@Model.GroupRankingByProperty["Distance"][item.pk_GroupID][2]%"
+                                             aria-valuemin="0" aria-valuemax="100">
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        }
+                    }
                 </div>
             </div>
 
@@ -437,54 +478,65 @@
                     <h6 class="m-0 font-weight-bold text-primary">Rank In Your Groups (Most Calories)</h6>
                 </div>
                 <div class="card-body">
-                    @foreach (var item in Model.UserGroups)
+                    @if (Model.UserGroups.Count < 1)
                     {
-                        <div style="cursor:pointer; user-select:none;" class="hover" onclick="location.href='@url/Group?GroupId=@item.pk_GroupID'">
-                            <h4 class="small font-weight-bold">
-                                @item.GroupName <span class="float-right">@Model.GroupRankingByProperty["Calories"][item.pk_GroupID][0]<sup>th</sup> / @Model.GroupRankingByProperty["Calories"][item.pk_GroupID][1]</span>
-                            </h4>
-                            <div class="progress mb-4">
-                                @if (Model.GroupRankingByProperty["Calories"][item.pk_GroupID][2] < 30)
-                                {
-                                    <div class="progress-bar bg-danger" role="progressbar" style="width:@Model.GroupRankingByProperty["Calories"][item.pk_GroupID][2]%"
-                                         aria-valuemin="0" aria-valuemax="100">
-                                    </div>
-
-                                }
-                                else if (Model.GroupRankingByProperty["Calories"][item.pk_GroupID][2] < 70)
-                                {
-                                    <div class="progress-bar bg-warning" role="progressbar" style="width:@Model.GroupRankingByProperty["Calories"][item.pk_GroupID][2]%"
-                                         aria-valuemin="0" aria-valuemax="100">
-                                    </div>
-                                }
-                                else
-                                {
-                                    <div class="progress-bar bg-success" role="progressbar" style="width:@Model.GroupRankingByProperty["Calories"][item.pk_GroupID][2]%"
-                                         aria-valuemin="0" aria-valuemax="100">
-                                    </div>
-                                }
-                            </div>
-                        </div>
+                        <div>No groups found. Ask a member of an existing group to add you or make your own one <a asp-controller="Account" asp-action="Group">here!</a></div>
                     }
+                    else
+                    {
+                        @foreach (var item in Model.UserGroups)
+                        {
+                            <div style="cursor:pointer; user-select:none;" class="hover" onclick="location.href='@url/Group?GroupId=@item.pk_GroupID'">
+                                <h4 class="small font-weight-bold">
+                                    @item.GroupName <span class="float-right">@Model.GroupRankingByProperty["Calories"][item.pk_GroupID][0]<sup>th</sup> / @Model.GroupRankingByProperty["Calories"][item.pk_GroupID][1]</span>
+                                </h4>
+                                <div class="progress mb-4">
+                                    @if (Model.GroupRankingByProperty["Calories"][item.pk_GroupID][2] < 30)
+                                    {
+                                        <div class="progress-bar bg-danger" role="progressbar" style="width:@Model.GroupRankingByProperty["Calories"][item.pk_GroupID][2]%"
+                                             aria-valuemin="0" aria-valuemax="100">
+                                        </div>
 
+                                    }
+                                    else if (Model.GroupRankingByProperty["Calories"][item.pk_GroupID][2] < 70)
+                                    {
+                                        <div class="progress-bar bg-warning" role="progressbar" style="width:@Model.GroupRankingByProperty["Calories"][item.pk_GroupID][2]%"
+                                             aria-valuemin="0" aria-valuemax="100">
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <div class="progress-bar bg-success" role="progressbar" style="width:@Model.GroupRankingByProperty["Calories"][item.pk_GroupID][2]%"
+                                             aria-valuemin="0" aria-valuemax="100">
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        }
+                    }
                 </div>
             </div>
         </div>
 
+        
         <div class="col-lg-6 mb-4">
-            <div class="card shadow mb-4">
-                <div class="card-header py-3">
-                    <h6 class="m-0 font-weight-bold text-primary">Group Memberships</h6>
+            @if (Model.UserGroups.Count > 0)
+            {
+                <div class="card shadow mb-4">
+                    <div class="card-header py-3">
+                        <h6 class="m-0 font-weight-bold text-primary">Group Memberships</h6>
+                    </div>
+                    <div class="card-body">
+                        @foreach (var item in Model.UserGroups)
+                        {
+                            <p class="h6 font-weight-bold hover" style="cursor:pointer;" onclick="location.href='@url/Group?GroupId=@item.pk_GroupID'">
+                                @item.GroupName
+                            </p>
+                        }
+                    </div>
                 </div>
-                <div class="card-body">
-                    @foreach (var item in Model.UserGroups)
-                    {
-                        <p class="h6 font-weight-bold hover" style="cursor:pointer;" onclick="location.href='@url/Group?GroupId=@item.pk_GroupID'">
-                            @item.GroupName
-                        </p>
-                    }
-                </div>
-            </div>
+            }
+
 
             <!-- Approach -->
             <div class="card shadow mb-4">

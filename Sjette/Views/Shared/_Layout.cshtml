@@ -1,9 +1,4 @@
-﻿@{ 
-    var ErrorMessage = TempData["Error"] as string;
-    var SuccesMessage = TempData["Succes"] as string;
-}
-
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -55,32 +50,6 @@
     </header>
     @RenderBody()
 
-    <div class="modal fade" id="formular">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-body">
-                    <div class="alert alert-block alert-danger">
-                        <h4>Error !</h4>
-                        <p id="errorText"></p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="modal fade" id="formular">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-body">
-                    <div class="alert alert-block alert-success">
-                        <h4>Succes !</h4>
-                        <p id="succesText"></p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <footer class="border-top footer text-dark text-center bg-white">
         <div class="container">
             &copy; 2021 - Sjette - Webdesign by TD
@@ -90,16 +59,6 @@
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/navbar.js"></script>
     <script src="~/js/parallax.js"></script>
-
-    <script type="text/javascript">
-        $('document').ready(function () {
-            var succesMessage = @SuccesMessage
-            var errorMessage = @ErrorMessage
-
-            console.log("Succes", succesMessage)
-            console.log("Error", errorMessage)
-        });
-    </script>
 
     @await RenderSectionAsync("Scripts", required: false)
 </body>

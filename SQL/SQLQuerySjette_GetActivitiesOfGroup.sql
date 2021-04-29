@@ -1,5 +1,5 @@
 --Author: Thibaut Deliever
---TestQuery for getting all activities from a group that happend in the past (getdate())
+--TestQuery for getting all the activities from a group in the past ( <= getdate() ).
 USE Sjette
 GO
 

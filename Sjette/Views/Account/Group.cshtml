@@ -96,7 +96,7 @@
             </div>
         </div>
 
-        @if (Model.AllUsersOfGroup != null)
+        @if (Model.AllUsersOfGroup != null && Model.AllUsersOfGroup.Count > 0)
         {
             int a = -1;
             <div class="col-xl-3 col-md-6 mb-4">
@@ -110,7 +110,7 @@
                         {
                             j = 0;
                         }
-                        <div onclick="changeGroupCard(@a, @j)" class="groupCards card-body vertical-center justify-content-between @(a==0?"":"d-none")">
+                        <div @(Model.AllUsersOfGroup.Count==1?"":"onclick=changeGroupCard("+a+","+j+")") class="groupCards card-body vertical-center justify-content-between @(a==0?"":"d-none")">
                             <div class="row w-100 no-gutters align-items-center">
                                 <div class="col mr-2">
                                     <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
@@ -127,35 +127,78 @@
                 </div>
             </div>
         }
-
-        @if (Model.MostMutualGroups.Count > 1)
+        else
         {
-            int b = -1;
             <div class="col-xl-3 col-md-6 mb-4">
-                <div style="cursor:pointer; user-select:none;" class="card border-left-warning shadow h-100 py-2">
-                    @foreach (var user in Model.MostMutualGroups)
-                    {
-                        int j = ++b + 1;
-                        if (user == Model.MostMutualGroups.Last())
+                <div style="cursor:pointer; user-select:none;" class="card border-left-info shadow h-100 py-2">
+                    <div class="groupCards card-body vertical-center justify-content-between">
+                        <div class="row w-100 no-gutters align-items-center">
+                            <div class="col mr-2">
+                                <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                    Members in your groups
+                                </div>
+                                <div class="h5 mb-0 font-weight-bold text-gray-800">0</div>
+                            </div>
+                            <div class="col-auto">
+                                <i class="fas fa-bullhorn fa-2x text-gray-300"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+
+        @if (Model.UserGroups.Count > 0 && Model.MostMutualGroups.Count > 0)
+        {
+            @if (Model.MostMutualGroups.Count > 1)
+            {
+                int b = -1;
+                <div class="col-xl-3 col-md-6 mb-4">
+                    <div style="cursor:pointer; user-select:none;" class="card border-left-warning shadow h-100 py-2">
+                        @foreach (var user in Model.MostMutualGroups)
                         {
-                            j = 0;
+                            int j = ++b + 1;
+                            if (user == Model.MostMutualGroups.Last())
+                            {
+                                j = 0;
+                            }
+                            <div onclick="changeMutualFriendsCard(@b, @j)" class="mutualFriendsCard card-body vertical-center justify-content-between @(b==0?"":"d-none")">
+                                <div class="row w-100 no-gutters align-items-center">
+                                    <div class="col mr-2">
+                                        <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                            Friends With Most Mutual Groups
+                                        </div>
+                                        <div class="h5 mb-0 font-weight-bold text-gray-800">@user.FirstName @user.LastName.Substring(0, 1).</div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <i class="fas fa-address-book fa-2x text-gray-300"></i>
+                                    </div>
+                                </div>
+                            </div>
                         }
-                        <div onclick="changeMutualFriendsCard(@b, @j)" class="mutualFriendsCard card-body vertical-center justify-content-between @(b==0?"":"d-none")">
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="col-xl-3 col-md-6 mb-4">
+                    <div style="user-select:none;" class="card border-left-warning shadow h-100 py-2">
+                        <div class="card-body vertical-center justify-content-between">
                             <div class="row w-100 no-gutters align-items-center">
                                 <div class="col mr-2">
                                     <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
                                         Friends With Most Mutual Groups
                                     </div>
-                                    <div class="h5 mb-0 font-weight-bold text-gray-800">@user.FirstName @user.LastName.Substring(0, 1).</div>
+                                    <div class="h5 mb-0 font-weight-bold text-gray-800">@Model.MostMutualGroups.First().FirstName @Model.MostMutualGroups.First().LastName.Substring(0, 1).</div>
                                 </div>
                                 <div class="col-auto">
                                     <i class="fas fa-address-book fa-2x text-gray-300"></i>
                                 </div>
                             </div>
                         </div>
-                    }
+                    </div>
                 </div>
-            </div>
+            }
         }
         else
         {
@@ -167,7 +210,7 @@
                                 <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
                                     Friends With Most Mutual Groups
                                 </div>
-                                <div class="h5 mb-0 font-weight-bold text-gray-800">@Model.MostMutualGroups.First().FirstName @Model.MostMutualGroups.First().LastName.Substring(0, 1).</div>
+                                <div class="h5 mb-0 font-weight-bold text-gray-800">/</div>
                             </div>
                             <div class="col-auto">
                                 <i class="fas fa-address-book fa-2x text-gray-300"></i>
@@ -177,6 +220,7 @@
                 </div>
             </div>
         }
+
     </div>
 
     <div class="row">
@@ -310,110 +354,135 @@
                                     <div class="card-body">
                                         <div class="tab-content" id="myTabContent">
                                             <div class="tab-pane fade show active" id="table1_@group.pk_GroupID" role="tabpanel">
-                                                <table class="table table-hover table-sm mb-0" id="table1_@group.GroupName">
-                                                    <thead>
-                                                        <tr>
-                                                            @{ int e = 0;}
-                                                            @foreach (var header in Model.TableHeaders["Cycling"])
+                                                @if (Model.TableData.ContainsKey(group.pk_GroupID) && Model.TableData[group.pk_GroupID].ContainsKey("Cycling"))
+                                                {
+                                                    <table class="table table-hover table-sm mb-0" id="table1_@group.GroupName">
+                                                        <thead>
+                                                            <tr>
+                                                                @{ int e = 0;}
+                                                                @foreach (var header in Model.TableHeaders["Cycling"])
+                                                                {
+                                                                    <th style="cursor:pointer; user-select:none;" onclick="sortTable(@e, 'table1_@group.GroupName')" scope="col">@header</th>
+                                                                    e++;
+                                                                }
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+
+                                                            @foreach (var dict in Model.TableData[group.pk_GroupID]["Cycling"])
                                                             {
-                                                                <th style="cursor:pointer; user-select:none;" onclick="sortTable(@e, 'table1_@group.GroupName')" scope="col">@header</th>
-                                                                e++;
-                                                            }
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                        @foreach (var dict in Model.TableData[group.pk_GroupID]["Cycling"])
-                                                        {
-                                                            <tr style="cursor:pointer;">
-                                                                <td scope="row" style="cursor:pointer;">@dict.Key</td>
-                                                                @{ int f = 0;}
+                                                                <tr style="cursor:pointer;">
+
+
+                                                                <td scope="row" style="cursor:pointer;"> @dict.Key </td>
+                                                                @{ int f = 0; }
                                                                 @foreach (var item in dict.Value)
                                                                 {
                                                                     @if (f == 1 || f == 4 || f == 5)
                                                                     {
-                                                                        <td>@TimeSpan.FromMinutes(item)</td>
+                                                                        <td> @TimeSpan.FromMinutes(item) </td>
                                                                     }
                                                                     else
                                                                     {
-                                                                        <td>@item</td>
+                                                                        <td> @item </td>
                                                                     }
                                                                     f++;
                                                                 }
-                                                            </tr>
-                                                        }
-                                                    </tbody>
-                                                </table>
+                                                                </tr>
+                                                            }
+                                                        </tbody>
+                                                    </table>
+                                                }
+                                                else
+                                                {
+                                                    <div>No activities found. Add a new one <a asp-controller="Account" asp-action="createActivity">here!</a></div>
+                                                }
                                             </div>
 
                                             <div class="tab-pane fade" id="table2_@group.pk_GroupID" role="tabpanel">
-                                                <table class="table table-hover table-sm mb-0" id="table2_@group.GroupName">
-                                                    <thead>
-                                                        <tr >
-                                                            @{ e = 0;}
-                                                            @foreach (var header in Model.TableHeaders["Running"])
-                                                            {
-                                                                <th style="cursor:pointer; user-select:none;" onclick="sortTable(@e, 'table2_@group.GroupName')" scope="col">@header</th>
-                                                                e++;
-                                                            }
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                        @foreach (var dict in Model.TableData[group.pk_GroupID]["Running"])
-                                                        {
-                                                            <tr style="cursor:pointer;">
-                                                                <td scope="row">@dict.Key</td>
-                                                                @{ int f = 0;}
-                                                                @foreach (var item in dict.Value)
+                                                @if (Model.TableData.ContainsKey(group.pk_GroupID) && Model.TableData[group.pk_GroupID].ContainsKey("Running"))
+                                                {
+                                                    <table class="table table-hover table-sm mb-0" id="table2_@group.GroupName">
+                                                        <thead>
+                                                            <tr>
+                                                                @{ int h = 0;}
+                                                                @foreach (var header in Model.TableHeaders["Running"])
                                                                 {
-                                                                    @if (f == 1 || f == 4 || f == 5 || f == 6 || f == 7)
-                                                                    {
-                                                                        <td>@TimeSpan.FromMinutes(item)</td>
-                                                                    }
-                                                                    else
-                                                                    {
-                                                                        <td>@item</td>
-                                                                    }
-                                                                    f++;
+                                                                    <th style="cursor:pointer; user-select:none;" onclick="sortTable(@h, 'table2_@group.GroupName')" scope="col">@header</th>
+                                                                    h++;
                                                                 }
                                                             </tr>
-                                                        }
-                                                    </tbody>
-                                                </table>
+                                                        </thead>
+                                                        <tbody>
+                                                            @foreach (var dict in Model.TableData[group.pk_GroupID]["Running"])
+                                                            {
+                                                                <tr style="cursor:pointer;">
+                                                                    <td scope="row">@dict.Key</td>
+                                                                    @{ int f = 0;}
+                                                                    @foreach (var item in dict.Value)
+                                                                    {
+                                                                        @if (f == 1 || f == 4 || f == 5 || f == 6 || f == 7)
+                                                                        {
+                                                                            <td>@TimeSpan.FromMinutes(item)</td>
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            <td>@item</td>
+                                                                        }
+                                                                        f++;
+                                                                    }
+                                                                </tr>
+                                                            }
+                                                        </tbody>
+                                                    </table>
+                                                }
+                                                else
+                                                {
+                                                    <div>No activities found. Add a new one <a asp-controller="Account" asp-action="createActivity">here!</a></div>
+                                                }
                                             </div>
+
                                             <div class="tab-pane fade" id="table3_@group.pk_GroupID" role="tabpanel">
-                                                <table class="table table-hover table-sm mb-0" id="table3_@group.GroupName">
-                                                    <thead>
-                                                        <tr>
-                                                            @{ e = 0;}
-                                                            @foreach (var header in Model.TableHeaders["Hiking"])
-                                                            {
-                                                                <th style="cursor:pointer; user-select:none;" onclick="sortTable(@e, 'table3_@group.GroupName')" scope="col">@header</th>
-                                                                e++;
-                                                            }
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                        @foreach (var dict in Model.TableData[group.pk_GroupID]["Hiking"])
-                                                        {
-                                                            <tr style="cursor:pointer;">
-                                                                <td scope="row">@dict.Key</td>
-                                                                @{ int f = 0;}
-                                                                @foreach (var item in dict.Value)
+                                                @if (Model.TableData.ContainsKey(group.pk_GroupID) && Model.TableData[group.pk_GroupID].ContainsKey("Hiking"))
+                                                {
+                                                    <table class="table table-hover table-sm mb-0" id="table3_@group.GroupName">
+                                                        <thead>
+                                                            <tr>
+                                                                @{ int i = 0;}
+                                                                @foreach (var header in Model.TableHeaders["Hiking"])
                                                                 {
-                                                                    @if (f == 1)
-                                                                    {
-                                                                        <td>@TimeSpan.FromMinutes(item)</td>
-                                                                    }
-                                                                    else
-                                                                    {
-                                                                        <td>@item</td>
-                                                                    }
-                                                                    f++;
+                                                                    <th style="cursor:pointer; user-select:none;" onclick="sortTable(@i, 'table3_@group.GroupName')" scope="col">@header</th>
+                                                                    i++;
                                                                 }
                                                             </tr>
-                                                        }
-                                                    </tbody>
-                                                </table>
+                                                        </thead>
+                                                        <tbody>
+                                                            @foreach (var dict in Model.TableData[group.pk_GroupID]["Hiking"])
+                                                            {
+                                                                <tr style="cursor:pointer;">
+                                                                    <td scope="row">@dict.Key</td>
+                                                                    @{ int f = 0;}
+                                                                    @foreach (var item in dict.Value)
+                                                                    {
+                                                                        @if (f == 1)
+                                                                        {
+                                                                            <td>@TimeSpan.FromMinutes(item)</td>
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            <td>@item</td>
+                                                                        }
+                                                                        f++;
+                                                                    }
+                                                                </tr>
+                                                            }
+                                                        </tbody>
+                                                    </table>
+                                                }
+                                                else
+                                                {
+                                                    <div>No activities found. Add a new one <a asp-controller="Account" asp-action="createActivity">here!</a></div>
+                                                }
                                             </div>
                                         </div>
                                     </div>

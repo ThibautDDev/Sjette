@@ -1,5 +1,5 @@
 --Author: Thibaut Deliever
---TestQuery for getting all activities from an user with a specific fk_UserID
+--TestQuery for getting all activities from an user with a specific fk_UserID.
 USE Sjette
 GO
 

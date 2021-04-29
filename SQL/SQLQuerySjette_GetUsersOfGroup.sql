@@ -1,5 +1,5 @@
 --Author: Thibaut Deliever
---TestQuery for getting all users from a group with a specifiek pk_GroupID
+--TestQuery for getting all users from a group with a specifiek pk_GroupID.
 USE Sjette
 GO
 

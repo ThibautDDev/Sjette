@@ -1,35 +1,36 @@
 -- Author: Thibaut Deliever
+-- TestQuery for inserting (randomized) data in the database.
 USE Sjette
 GO
 
 --First Command
---Initialize data for table dbo.Users in database 'Sjette'
---15 Unique users with own email but with same password ("Dummie123")
---Dummies generated with 'https://nl.fakenamegenerator.com/gen-male-nl-bg.php'
+--Initialize data for table dbo.Users in database 'Sjette'.
+--15 Unique users with own email and same password ("@Dummie123").
+--Dummies generated with 'https://nl.fakenamegenerator.com/gen-male-nl-bg.php'.
 INSERT INTO Users (FirstName, LastName, [Admin], Email,	PasswordHash, [Hash], CreationDate)
 VALUES 
-	('Thibaut',	'Deliever',			1, 'thibaut.deliever@dummie.be',		'gqcDhyRRIRr3FEm1QMiToj28k4W65cy3X/nsHLarE1M=', 'XaY6iCflqGpd18sBBt/UdpV2psxfhMaNiV78j3Wl0KU=', '2021-03-22'),
-	('Leander',	'Deweerdt',			0, 'leander.deweerdt@dummie.be',		'gqcDhyRRIRr3FEm1QMiToj28k4W65cy3X/nsHLarE1M=', 'XaY6iCflqGpd18sBBt/UdpV2psxfhMaNiV78j3Wl0KU=', '2021-03-22'),
-	('Faisal',	'Ahktar',			0, 'faisal.ahktar@dummie.be',			'gqcDhyRRIRr3FEm1QMiToj28k4W65cy3X/nsHLarE1M=', 'XaY6iCflqGpd18sBBt/UdpV2psxfhMaNiV78j3Wl0KU=', '2021-03-22'),
+	('Thibaut',	'Deliever',		1, 'thibaut.deliever@dummie.be',	'gqcDhyRRIRr3FEm1QMiToj28k4W65cy3X/nsHLarE1M=', 'XaY6iCflqGpd18sBBt/UdpV2psxfhMaNiV78j3Wl0KU=', '2021-03-22'),
+	('Leander',	'Deweerdt',		0, 'leander.deweerdt@dummie.be',	'gqcDhyRRIRr3FEm1QMiToj28k4W65cy3X/nsHLarE1M=', 'XaY6iCflqGpd18sBBt/UdpV2psxfhMaNiV78j3Wl0KU=', '2021-03-22'),
+	('Faisal',	'Ahktar',		0, 'faisal.ahktar@dummie.be',		'gqcDhyRRIRr3FEm1QMiToj28k4W65cy3X/nsHLarE1M=', 'XaY6iCflqGpd18sBBt/UdpV2psxfhMaNiV78j3Wl0KU=', '2021-03-22'),
 	('Steije',	'Hoppenbrouwers',	0, 'steije.hoppenbrouwers@dummie.be',	'gqcDhyRRIRr3FEm1QMiToj28k4W65cy3X/nsHLarE1M=', 'XaY6iCflqGpd18sBBt/UdpV2psxfhMaNiV78j3Wl0KU=', '2021-03-22'),
-	('Enzio',	'Feenstra',			0, 'enzio.feenstra@dummie.be',			'gqcDhyRRIRr3FEm1QMiToj28k4W65cy3X/nsHLarE1M=', 'XaY6iCflqGpd18sBBt/UdpV2psxfhMaNiV78j3Wl0KU=', '2021-03-23'),
-	('Nander',	'Hoefnagels',		0, 'nander.hoefnagels@dummie.be',		'gqcDhyRRIRr3FEm1QMiToj28k4W65cy3X/nsHLarE1M=', 'XaY6iCflqGpd18sBBt/UdpV2psxfhMaNiV78j3Wl0KU=', '2021-03-24'),
-	('Mansour',	'Davis',			0, 'mansour.davis@dummie.be',			'gqcDhyRRIRr3FEm1QMiToj28k4W65cy3X/nsHLarE1M=', 'XaY6iCflqGpd18sBBt/UdpV2psxfhMaNiV78j3Wl0KU=', '2021-03-25'),
-	('Elvi',	'Schoofs',			0, 'elvi.schoofs@dummie.be',			'gqcDhyRRIRr3FEm1QMiToj28k4W65cy3X/nsHLarE1M=', 'XaY6iCflqGpd18sBBt/UdpV2psxfhMaNiV78j3Wl0KU=', '2021-03-26'),
-	('Tomas',	'Jansens',			0, 'Tomas.jansens@dummie.be',			'gqcDhyRRIRr3FEm1QMiToj28k4W65cy3X/nsHLarE1M=', 'XaY6iCflqGpd18sBBt/UdpV2psxfhMaNiV78j3Wl0KU=', '2021-03-27'),
-	('Madelief','Van Der Drift',	0, 'madelief.vanderdrift@dummie.be',	'gqcDhyRRIRr3FEm1QMiToj28k4W65cy3X/nsHLarE1M=', 'XaY6iCflqGpd18sBBt/UdpV2psxfhMaNiV78j3Wl0KU=', '2021-03-28'),
-	('Charlie',	'Gijzen',			0, 'charlie.gijzen@dummie.be',			'gqcDhyRRIRr3FEm1QMiToj28k4W65cy3X/nsHLarE1M=', 'XaY6iCflqGpd18sBBt/UdpV2psxfhMaNiV78j3Wl0KU=', '2021-03-29'),
-	('Micheal',	'Wingelaar',		0, 'micheal.wingelaar@dummie.be',		'gqcDhyRRIRr3FEm1QMiToj28k4W65cy3X/nsHLarE1M=', 'XaY6iCflqGpd18sBBt/UdpV2psxfhMaNiV78j3Wl0KU=', '2021-03-29'),
+	('Enzio',	'Feenstra',		0, 'enzio.feenstra@dummie.be',		'gqcDhyRRIRr3FEm1QMiToj28k4W65cy3X/nsHLarE1M=', 'XaY6iCflqGpd18sBBt/UdpV2psxfhMaNiV78j3Wl0KU=', '2021-03-23'),
+	('Nander',	'Hoefnagels',		0, 'nander.hoefnagels@dummie.be',	'gqcDhyRRIRr3FEm1QMiToj28k4W65cy3X/nsHLarE1M=', 'XaY6iCflqGpd18sBBt/UdpV2psxfhMaNiV78j3Wl0KU=', '2021-03-24'),
+	('Mansour',	'Davis',		0, 'mansour.davis@dummie.be',		'gqcDhyRRIRr3FEm1QMiToj28k4W65cy3X/nsHLarE1M=', 'XaY6iCflqGpd18sBBt/UdpV2psxfhMaNiV78j3Wl0KU=', '2021-03-25'),
+	('Elvi',	'Schoofs',		0, 'elvi.schoofs@dummie.be',		'gqcDhyRRIRr3FEm1QMiToj28k4W65cy3X/nsHLarE1M=', 'XaY6iCflqGpd18sBBt/UdpV2psxfhMaNiV78j3Wl0KU=', '2021-03-26'),
+	('Tomas',	'Jansens',		0, 'Tomas.jansens@dummie.be',		'gqcDhyRRIRr3FEm1QMiToj28k4W65cy3X/nsHLarE1M=', 'XaY6iCflqGpd18sBBt/UdpV2psxfhMaNiV78j3Wl0KU=', '2021-03-27'),
+	('Madelief',	'Van Der Drift',	0, 'madelief.vanderdrift@dummie.be',	'gqcDhyRRIRr3FEm1QMiToj28k4W65cy3X/nsHLarE1M=', 'XaY6iCflqGpd18sBBt/UdpV2psxfhMaNiV78j3Wl0KU=', '2021-03-28'),
+	('Charlie',	'Gijzen',		0, 'charlie.gijzen@dummie.be',		'gqcDhyRRIRr3FEm1QMiToj28k4W65cy3X/nsHLarE1M=', 'XaY6iCflqGpd18sBBt/UdpV2psxfhMaNiV78j3Wl0KU=', '2021-03-29'),
+	('Micheal',	'Wingelaar',		0, 'micheal.wingelaar@dummie.be',	'gqcDhyRRIRr3FEm1QMiToj28k4W65cy3X/nsHLarE1M=', 'XaY6iCflqGpd18sBBt/UdpV2psxfhMaNiV78j3Wl0KU=', '2021-03-29'),
 	('Mathijs',	'Van Den Kerkhove',	0, 'mathijs.vandenkerkhove@dummie.be',	'gqcDhyRRIRr3FEm1QMiToj28k4W65cy3X/nsHLarE1M=', 'XaY6iCflqGpd18sBBt/UdpV2psxfhMaNiV78j3Wl0KU=', '2021-03-29'),
-	('Yanick',	'Declercq',			0, 'yanick.declercq@dummie.be',			'gqcDhyRRIRr3FEm1QMiToj28k4W65cy3X/nsHLarE1M=', 'XaY6iCflqGpd18sBBt/UdpV2psxfhMaNiV78j3Wl0KU=', '2021-03-29'),
-	('Jurgen',	'Van Den Bulcke',	0, 'jurgen.vandenbulcke@dummie.be',		'gqcDhyRRIRr3FEm1QMiToj28k4W65cy3X/nsHLarE1M=', 'XaY6iCflqGpd18sBBt/UdpV2psxfhMaNiV78j3Wl0KU=', '2021-03-30');
+	('Yanick',	'Declercq',		0, 'yanick.declercq@dummie.be',		'gqcDhyRRIRr3FEm1QMiToj28k4W65cy3X/nsHLarE1M=', 'XaY6iCflqGpd18sBBt/UdpV2psxfhMaNiV78j3Wl0KU=', '2021-03-29'),
+	('Jurgen',	'Van Den Bulcke',	0, 'jurgen.vandenbulcke@dummie.be',	'gqcDhyRRIRr3FEm1QMiToj28k4W65cy3X/nsHLarE1M=', 'XaY6iCflqGpd18sBBt/UdpV2psxfhMaNiV78j3Wl0KU=', '2021-03-30');
 
 
 
 
 --Second Command
---Initialize data for table dbo.Groups in database 'Sjette'
---5 Unique groups with 1 contains each member.
+--Initialize data for table dbo.Groups in database 'Sjette'.
+--5 Unique groups.
 INSERT INTO Groups (fk_CreatorID, GroupName)
 VALUES	
 	(1, 'Kulak Tegen Kanker Cup'),
@@ -42,8 +43,8 @@ VALUES
 
 
 --Third Command
---Initialize data for table dbo.GroupMembership in database 'Sjette'
---1 group contains each single member.
+--Initialize data for table dbo.GroupMembership in database 'Sjette'.
+--1 group contains each single user.
 INSERT INTO GroupMembership(UserID, GroupID)
 VALUES 
 	(1,  1),
@@ -92,9 +93,8 @@ VALUES
 
 
 --Fourth Command
---Initialize data for table dbo.Activities in database 'Sjette'
---Each user got at least 5 activities
---Numbers are randomly chosen
+--Initialize data for table dbo.Activities in database 'Sjette'.
+--Data generated with python file in the folder 'SQL'.
 INSERT INTO Activities (fk_UserID, ActivityType, ActivityName, TotalCalories, TKm, TTime, StartTime, Gear)
 VALUES 
 (1, 'Running', 'Running1', 1285, 13.22, '01:44:56', '2021-02-16 10:00:00', 'Polar Watch'),

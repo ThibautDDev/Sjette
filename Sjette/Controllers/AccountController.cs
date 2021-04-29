@@ -32,7 +32,7 @@ namespace Sjette.Controllers
         /* 
          * Dictionairy that is used inside this controller to pass userinformation between functions.
          * This is an alternative for the User.Claims. Because of the internal use inside this controller,
-         * the functions is set to a private one. 
+         * the functions is set to private. 
         */
         private void setUserDictionairy()
         {
@@ -98,7 +98,7 @@ namespace Sjette.Controllers
 
 
         /*
-         * Function that returns an userObject of the SQL DB with a given context and id.
+         * Function that returns an activityObject of the SQL DB with a given context and id.
          * This functions is private because of the internal use inside this controller.
         */
         private static async Task<Activities> getActivityByIdAsync(SjetteContext ctx, int id)
@@ -108,7 +108,7 @@ namespace Sjette.Controllers
 
 
         /*
-         * Function that returns an userObject of the SQL DB with a given context and id.
+         * Function that returns an groupObject of the SQL DB with a given context and groupName.
          * This functions is private because of the internal use inside this controller.
         */
         private static async Task<Groups> getGroupByNameAsync(SjetteContext ctx, string groupName)
@@ -150,7 +150,7 @@ namespace Sjette.Controllers
 
         /* 
          * Function that returns a Dictionary with as key the primaryKey of a group and as value all the activities
-         * of all users of a group with a given context and list of groupObjects. 
+         * of all users of a group, with a given context and list of groupObjects. 
          * This functions is private because of the internal use inside this controller.
         */
         private static async Task<Dictionary<int, List<Activities>>> getActivitiesOfGroupAsync(SjetteContext ctx, List<Groups> groupsOfUser)
@@ -174,7 +174,7 @@ namespace Sjette.Controllers
 
         /* 
          * Function that returns a Dictionary with as key the primaryKey of a group and as value all the user
-         * of a group a given context and list of groupObjects. 
+         * of a group, with a given context and list of groupObjects. 
          * This functions is private because of the internal use inside this controller.
         */
         private static async Task<Dictionary<int, List<Users>>> getAllUsersOfGroupAsync(SjetteContext ctx, List<Groups> groupsOfUser)
@@ -208,18 +208,19 @@ namespace Sjette.Controllers
          * Function that returns a list of mutual users with a given context and list of groupObjects. 
          * This functions is private because of the internal use inside this controller.
         */
-        private static async Task<List<Users>> getMutualUsers(SjetteContext ctx)
+        private static async Task<List<MutualUsers>> getMutualUsers(SjetteContext ctx)
         {
-            var x = await ctx.Users.FromSqlRaw($"SELECT U.* " + 
-                                               $"FROM Users AS U " +
-                                               $"INNER JOIN GroupMembership AS GM " +
-                                               $"ON U.pk_UserID = GM.UserID").ToListAsync();
+            var x = await ctx.MutualUsers.FromSqlRaw($"SELECT ROW_NUMBER() OVER(ORDER BY GroupID ASC) AS Row, " +
+                                                     $"U.*, GM.GroupID " + 
+                                                     $"FROM Users AS U " +
+                                                     $"INNER JOIN GroupMembership AS GM " +
+                                                     $"ON U.pk_UserID = GM.UserID").ToListAsync();
             return x;
         }
 
 
         /* 
-         * Function that returns a list of mutual users with a given context and list of groupObjects. 
+         * Function that returns a list of groupMembershipObjects with a given context and an userId. 
          * This functions is private because of the internal use inside this controller.
         */
         private static async Task<List<GroupMembership>> GetGroupMembershipsOfUserAsync(SjetteContext ctx, int userId)

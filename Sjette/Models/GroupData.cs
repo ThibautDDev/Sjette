@@ -21,7 +21,7 @@ namespace Sjette.Models
 
         // GroupStats
         public List<Groups> GroupsCreated { get; set; }
-        public List<Users> MostMutualGroups { get; set; }
+        public List<MutualUsers> MostMutualGroups { get; set; }
 
 
         // LineCharts
@@ -36,7 +36,7 @@ namespace Sjette.Models
         // Constructor
         public GroupData(Users user, List<Groups> groups, List<Activities> activities, 
             Dictionary<int, List<Activities>> groupActivities, 
-            Dictionary<int, List<Users>>  allUsersOfGroup, List<Users> mutualUsers)
+            Dictionary<int, List<Users>>  allUsersOfGroup, List<MutualUsers> mutualUsers)
         {
             string[] array1 = { "Activities", "Hiking", "Cycling", "Running", "Calories", "Distance"};
             List<string> listOfLineChartProperties = new List<string>(array1);
@@ -83,24 +83,29 @@ namespace Sjette.Models
 
 
 
-        private void setMostMutualGroups(List<Users> mutualUsers)
+        private void setMostMutualGroups(List<MutualUsers> mutualUsers)
         {
-            var returnLst = new List<Users>();
-            var dictBeforeReturn = new Dictionary<Users, int>();
+            var returnLst = new List<MutualUsers>();
+            var dictBeforeReturn = new Dictionary<MutualUsers, int>();
             foreach (var user in mutualUsers)
             {
-                if(user != User)
+                if(user.pk_UserID != User.pk_UserID & UserGroups.Select(ug => ug.pk_GroupID).ToList().Contains(user.GroupID))
                 {
-                    int prevValue;
-                    dictBeforeReturn.TryGetValue(user, out prevValue);
-                    dictBeforeReturn[user] = prevValue + 1;
+                    bool done = false;
+                    foreach (var obj in dictBeforeReturn.Keys) if (obj.pk_UserID == user.pk_UserID)
+                        {
+                            int prevValue = 0;
+                            prevValue = dictBeforeReturn[obj];
+                            dictBeforeReturn[obj] = prevValue + 1;
+                            done = true;
+                        }
+                    if (!done) dictBeforeReturn[user] = 1;
                 }
-                
             }
 
             var dictBeforeReturnOrdered = dictBeforeReturn.OrderByDescending(x => x.Value).ToDictionary(x => x.Key, x => x.Value);
             var maxValue = dictBeforeReturnOrdered.FirstOrDefault().Value;
-            foreach (var item in dictBeforeReturnOrdered) if (item.Value >= maxValue) returnLst.Add(item.Key);
+            foreach (var item in dictBeforeReturnOrdered) if (item.Value >= maxValue && item.Value >= 1) returnLst.Add(item.Key);
 
             this.MostMutualGroups = returnLst;
         }

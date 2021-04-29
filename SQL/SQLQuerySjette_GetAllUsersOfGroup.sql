@@ -1,3 +1,5 @@
+-- Author: Thibaut Deliever
+-- TestQuery for getting all users of a group with a specific GroupID.
 USE Sjette
 GO
 
