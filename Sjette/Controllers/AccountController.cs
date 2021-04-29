@@ -495,7 +495,7 @@ namespace Sjette.Controllers
                 }
                 else TempData["Error"] = "This person is not a valid user of this application. Please select a valid member";
             }
-            else redirectUrl = "/Error/403";
+            else redirectUrl = "~/Error/403";
 
             if (done) TempData["Succes"] = "Member succesfully removed to the group";
             var url = $"~{redirectUrl}";
@@ -530,7 +530,7 @@ namespace Sjette.Controllers
                 }
                 else TempData["Error"] = "This person is not a valid user of this application. Please select a valid member";
             }
-            else redirectUrl = "/Error/403";
+            else redirectUrl = "~/Error/403";
 
             if (done) TempData["Succes"] = "Admin-rights were succesfully transfered";
             var url = $"~{redirectUrl}";
