@@ -313,7 +313,7 @@ namespace Sjette.Controllers
             await _context.SaveChangesAsync();
 
             TempData["Succes"] = "The activity-data has been succesfully updated.";
-            var url = $"~{redirectUrl}";
+            var url = $"{redirectUrl}";
             return Redirect(url);
         }
 
@@ -329,7 +329,7 @@ namespace Sjette.Controllers
             await _context.SaveChangesAsync();
 
             TempData["Succes"] = "The activity has been succesfully deleted.";
-            var url = $"~{redirectUrl}";
+            var url = $"{redirectUrl}";
             return Redirect(url);
         }
 
@@ -372,7 +372,7 @@ namespace Sjette.Controllers
             await _context.SaveChangesAsync();
 
             TempData["Succes"] = "Group was succesfully created";
-            var url = $"~{redirectUrl}";
+            var url = $"{redirectUrl}";
             return Redirect(url);
         }
 
@@ -400,7 +400,7 @@ namespace Sjette.Controllers
             if (done) TempData["Succes"] = "You succesfully left the group";
             else TempData["Error"] = "Something went wrong while leaving this group. Please contact an administrator";
 
-            var url = $"~{redirectUrl}";
+            var url = $"{redirectUrl}";
             return Redirect(url);
         }
 
@@ -431,7 +431,7 @@ namespace Sjette.Controllers
             } else return Redirect("~/Error/403");
 
             if (done) TempData["Succes"] = "Group was succesfully deleted";
-            var url = $"~{redirectUrl}";
+            var url = $"{redirectUrl}";
             return Redirect(url);
         }
 
@@ -464,7 +464,7 @@ namespace Sjette.Controllers
             } else TempData["Error"] = "Email is not linked to a valid user. Try again with a valid email";
 
             if (done) TempData["Succes"] = "Member succesfully added to the group";
-            var url = $"~{redirectUrl}";
+            var url = $"{redirectUrl}";
             return Redirect(url);
         }
 
@@ -498,7 +498,7 @@ namespace Sjette.Controllers
             else redirectUrl = "~/Error/403";
 
             if (done) TempData["Succes"] = "Member succesfully removed to the group";
-            var url = $"~{redirectUrl}";
+            var url = $"{redirectUrl}";
             return Redirect(url);
         }
 
@@ -533,7 +533,7 @@ namespace Sjette.Controllers
             else redirectUrl = "~/Error/403";
 
             if (done) TempData["Succes"] = "Admin-rights were succesfully transfered";
-            var url = $"~{redirectUrl}";
+            var url = $"{redirectUrl}";
             return Redirect(url);
         }
 
