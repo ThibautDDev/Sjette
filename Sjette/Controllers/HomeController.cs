@@ -54,7 +54,7 @@ namespace Sjette.Controllers
         }
 
         // GET: /Login
-        [HttpGet("login")]
+        [HttpGet("Login")]
         public IActionResult Login(string returnUrl)
         {
             ViewData["ReturnUrl"] = returnUrl;

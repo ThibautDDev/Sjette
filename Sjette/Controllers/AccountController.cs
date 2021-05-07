@@ -555,7 +555,7 @@ namespace Sjette.Controllers
             setUserDictionairy();
             var id = Convert.ToInt32(UserDictionairy["UserID"]);
             var user = await getUserByIdAsync(_context, id);
-            var oldPasswordHash = (oldPassword != null) ? hashPassword(user.Hash, oldPassword):"";
+            var oldPasswordHash = (oldPassword != null) ? hashPassword(user.Hash, oldPassword) : "";
 
             if (firstName != null)
             {
@@ -581,30 +581,32 @@ namespace Sjette.Controllers
                     done = true;
                 }
                 else TempData["PasswordRequirementsError"] = "Please make sure that the new password meets the requirements.";
-
-            } else if (newPassword != newPasswordConfirm)
-            {
-                TempData["NewPasswordError"] = "Password did not match with each other.";
-            } else if (newPassword == "")
+            }
+            else if (newPassword == "")
             {
                 TempData["NewPasswordError"] = "Please fill in a password";
-            } else
+            }
+            else if (newPassword != newPasswordConfirm)
+            {
+                TempData["NewPasswordError"] = "Password did not match with each other.";
+            }
+            else if (user.PasswordHash != oldPasswordHash && oldPasswordHash != "")
             {
                 TempData["PasswordError"] = "Old Password did not match with this account.";
             }
 
-            if (done)
+            if (done && TempData["PasswordRequirementsError"] == null && TempData["NewPasswordError"] == null && TempData["PasswordError"] == null)
             {
                 _context.Users.Update(user);
                 await _context.SaveChangesAsync();
                 TempData["Succes"] = "Settings were succesfully saved";
-                
+
             }
 
             if (done && TempData["PasswordError"] == null && TempData["NewPasswordError"] == null && TempData["PasswordRequirementsError"] == null)
             {
                 return Redirect("~/Account");
-            } 
+            }
             else return Redirect("~/Account/Settings");
         }
 
