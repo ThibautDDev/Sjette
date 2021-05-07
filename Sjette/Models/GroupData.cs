@@ -177,6 +177,7 @@ namespace Sjette.Models
             return (int)(((double)distanceNeeded / distanceDone) * (int) timeDone.TotalMinutes);
         }
 
+
         //GroupId  -  Dict<Activity - Dict<UserName - List<numbers>
         private void SetTableData()
         {
